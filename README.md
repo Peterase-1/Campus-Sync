@@ -7,43 +7,43 @@ A comprehensive student management platform designed to help university students
 
 ## Features
 
-### 📅 Timetable & Class Schedule
+### Timetable & Class Schedule
 - **Weekly Calendar View**: Visualize your class schedule at a glance.
 - **Class Management**: Add, edit, and delete classes with details like location, professor, and color coding.
 - **Attendance Tracking**: Keep track of your attendance for each class.
 
-### 🍅 Pomodoro Timer
+### Pomodoro Timer
 - **Focus Sessions**: Built-in 25-minute focus timer.
 - **Break Intervals**: Automatic 5-minute break periods.
 - **Session Tracking**: Monitor your total focus hours and completed sessions.
 - **Visual Progress**: Circular progress indicator and audio notifications.
 
-### 📝 Quick Notes
+### Quick Notes
 - **Markdown Support**: Write rich text notes with easy formatting.
 - **Organization**: Pin important notes and search through your collection.
 - **Color Coding**: Categorize notes visually.
 
-### 📊 Enhanced Dashboard
+### Enhanced Dashboard
 - **Real-time Analytics**: Live data on habits, finance, and study time.
 - **Visual Charts**: Interactive graphs for habit completion and financial overview.
 - **Quick Actions**: Fast access to frequently used tools.
 - **Upcoming Deadlines**: Widget to track immediate goals.
 
-### 🌱 Habit Garden
+### Habit Garden
 - **Habit Tracking**: Build and monitor positive habits.
 - **Streak System**: Gamified consistency tracking.
 - **Frequency Options**: Daily, weekly, or monthly habits.
 
-### 💰 Finance Center
+### Finance Center
 - **Transaction Tracking**: Log income and expenses.
 - **Financial Health**: View total balance, income, and expenses.
 - **Categorization**: Organize transactions by type (Food, Transport, etc.).
 
-### 📚 Study Desk
+### Study Desk
 - **Task Management**: Create and track study tasks.
 - **Study Notes**: Organize academic notes by subject.
 
-### 🎯 Goals
+### Goals
 - **Goal Setting**: Define personal, academic, and financial goals.
 - **Progress Tracking**: Monitor completion status.
 
