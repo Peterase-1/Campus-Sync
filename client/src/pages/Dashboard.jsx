@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { mot ion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import Navbar from '../components/Navbar';
