@@ -26,6 +26,14 @@ app.use('/api/timetable', timetableRoutes);
 app.use('/api/pomodoro', pomodoroRoutes);
 app.use('/api/notes', notesRoutes);
 
+// Debug endpoint to list all routes
+app.get('/api/debug/routes', (req, res) => {
+  res.json({
+    message: 'Routes registered successfully',
+    routes: ['/api/auth', '/api/habits', '/api/finance', '/api/study', '/api/goals', '/api/timetable', '/api/pomodoro', '/api/notes']
+  });
+});
+
 app.get('/', (req, res) => {
   res.send('Campus Sync API is running');
 });

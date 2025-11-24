@@ -102,7 +102,7 @@ const Pomodoro = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl font-bold text-gray-900 dark:text-white mb-8"
         >
-          Pomodoro Timer ⏱️
+          Pomodoro Timer
         </motion.h1>
 
         <div className="max-w-2xl mx-auto">

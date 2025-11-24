@@ -79,7 +79,7 @@ const QuickNotes = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl font-bold text-gray-900 dark:text-white mb-8"
         >
-          Quick Notes 📝
+          Quick Notes
         </motion.h1>
 
         {/* Search & Add */}
