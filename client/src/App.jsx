@@ -13,6 +13,9 @@ import FinanceCenter from './pages/FinanceCenter';
 import StudyDesk from './pages/StudyDesk';
 import Goals from './pages/Goals';
 import Profile from './pages/Profile';
+import Timetable from './pages/Timetable';
+import Pomodoro from './pages/Pomodoro';
+import QuickNotes from './pages/QuickNotes';
 
 function App() {
   return (
@@ -33,6 +36,9 @@ function App() {
                 <Route path="desk" element={<StudyDesk />} />
                 <Route path="goals" element={<Goals />} />
                 <Route path="profile" element={<Profile />} />
+                <Route path="timetable" element={<Timetable />} />
+                <Route path="pomodoro" element={<Pomodoro />} />
+                <Route path="notes" element={<QuickNotes />} />
               </Routes>
             } />
           </Routes>
