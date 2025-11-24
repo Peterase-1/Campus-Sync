@@ -25,6 +25,8 @@ model User {
   attendance        Attendance[]
   pomodoroSessions  PomodoroSession[]
   quickNotes        QuickNote[]
+  achievements      Achievement[]
+  budgets           Budget[]
 }
 
 model Goal {
@@ -38,6 +40,7 @@ model Goal {
   progress    Int       @default(0) // 0-100
   completed   Boolean   @default(false)
   createdAt   DateTime  @default(now())
+  milestones  Milestone[]
 }
 
 model Habit {
@@ -103,6 +106,7 @@ model Class {
   credits     Int?
   createdAt   DateTime     @default(now())
   attendance  Attendance[]
+  assignments Assignment[]
 }
 
 model Attendance {
@@ -140,4 +144,43 @@ model QuickNote {
   color     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Milestone {
+  id        String    @id @default(uuid())
+  goalId    String
+  goal      Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  title     String
+  completed Boolean   @default(false)
+  dueDate   DateTime?
+}
+
+model Achievement {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  type       String   // e.g., 'first_goal', 'saver_streak'
+  unlockedAt DateTime @default(now())
+}
+
+model Budget {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  category  String
+  amount    Float
+  period    String   @default("monthly") // 'monthly' | 'weekly'
+  updatedAt DateTime @updatedAt
+}
+
+model Assignment {
+  id        String   @id @default(uuid())
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title     String
+  dueDate   DateTime
+  type      String   // 'homework', 'exam', 'project'
+  completed Boolean  @default(false)
+  grade     Float?   // Score received
+  maxGrade  Float?   // Total possible score
 }

@@ -2,120 +2,101 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '../context/UserContext';
 import Navbar from '../components/Navbar';
-import {
-  Plus,
-  Target,
-  CheckCircle,
-  Clock,
-  TrendingUp,
-  Calendar,
-  Star,
-  Edit3,
-  Trash2,
-  Flame
-} from 'lucide-react';
+import { Plus, Target, CheckCircle, Flame, Trash2 } from 'lucide-react';
+import { habitsAPI } from '../utils/api';
 
 const HabitGarden = () => {
-  const { user, updateUserData } = useUser();
+  const { user } = useUser();
+  const [habits, setHabits] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newHabit, setNewHabit] = useState({ name: '', description: '', frequency: 'daily' });
 
-  const habits = user?.data?.habits || [];
-
-  const addHabit = () => {
-    if (newHabit.name.trim()) {
-      // Check if a habit with the same name already exists
-      const existingHabit = habits.find(habit =>
-        habit.name.toLowerCase().trim() === newHabit.name.toLowerCase().trim()
-      );
-
-      if (existingHabit) {
-        alert('A habit with this name already exists!');
-        return;
+  // Load habits from DB on mount
+  useEffect(() => {
+    const fetchHabits = async () => {
+      try {
+        const data = await habitsAPI.getAll();
+        setHabits(data);
+      } catch (e) {
+        console.error('Failed to load habits', e);
       }
+    };
+    fetchHabits();
+  }, []);
 
-      const habit = {
-        id: Date.now(),
-        name: newHabit.name,
-        description: newHabit.description,
-        frequency: newHabit.frequency,
-        completed: false,
-        streak: 0,
-        createdAt: new Date().toISOString(),
-        lastCompleted: null
-      };
-
-      updateUserData('habits', [...habits, habit]);
+  const addHabit = async () => {
+    if (!newHabit.name.trim()) return;
+    // Prevent duplicate names
+    if (habits.find(h => h.name.toLowerCase().trim() === newHabit.name.toLowerCase().trim())) {
+      alert('A habit with this name already exists!');
+      return;
+    }
+    try {
+      const created = await habitsAPI.create(newHabit);
+      setHabits(prev => [...prev, created]);
       setNewHabit({ name: '', description: '', frequency: 'daily' });
       setShowAddForm(false);
+    } catch (e) {
+      console.error('Failed to create habit', e);
     }
   };
 
-  const toggleHabit = (habitId) => {
-    const updatedHabits = habits.map(habit => {
-      if (habit.id === habitId) {
-        const wasCompleted = habit.completed;
-        const newCompleted = !wasCompleted;
-        const today = new Date().toDateString();
-        const lastCompletedDate = habit.lastCompleted ? new Date(habit.lastCompleted).toDateString() : null;
-
-        let newStreak = habit.streak;
-
-        // Only increase streak if:
-        // 1. We're completing the habit (not uncompleting)
-        // 2. We haven't completed it today yet
-        if (newCompleted && lastCompletedDate !== today) {
-          newStreak = habit.streak + 1;
-        }
-
-        return {
-          ...habit,
-          completed: newCompleted,
-          streak: newStreak,
-          lastCompleted: newCompleted ? new Date().toISOString() : habit.lastCompleted
-        };
-      }
-      return habit;
-    });
-    updateUserData('habits', updatedHabits);
+  const toggleHabit = async (habit) => {
+    try {
+      const updated = await habitsAPI.update(habit.id, { completed: !habit.completed });
+      setHabits(prev => prev.map(h => (h.id === habit.id ? updated : h)));
+    } catch (e) {
+      console.error('Failed to update habit', e);
+    }
   };
 
-  const deleteHabit = (habitId) => {
-    const updatedHabits = habits.filter(habit => habit.id !== habitId);
-    updateUserData('habits', updatedHabits);
+  const deleteHabit = async (habitId) => {
+    try {
+      await habitsAPI.delete(habitId);
+      setHabits(prev => prev.filter(h => h.id !== habitId));
+    } catch (e) {
+      console.error('Failed to delete habit', e);
+    }
   };
 
-  const resetStreak = (habitId) => {
-    const updatedHabits = habits.map(habit =>
-      habit.id === habitId
-        ? { ...habit, streak: 0, lastCompleted: null }
-        : habit
-    );
-    updateUserData('habits', updatedHabits);
+  const resetStreak = async (habit) => {
+    try {
+      const updated = await habitsAPI.update(habit.id, { streak: 0, lastCompleted: null });
+      setHabits(prev => prev.map(h => (h.id === habit.id ? updated : h)));
+    } catch (e) {
+      console.error('Failed to reset streak', e);
+    }
   };
 
-  // Function to check and reset streaks for missed days
+  // Function to check and reset streaks for missed days (client side)
   const checkStreakReset = () => {
     const today = new Date();
-    const updatedHabits = habits.map(habit => {
+    let hasChanges = false;
+    const updated = habits.map(habit => {
       if (habit.lastCompleted) {
-        const lastCompleted = new Date(habit.lastCompleted);
-        const daysDiff = Math.floor((today - lastCompleted) / (1000 * 60 * 60 * 24));
-
-        // If more than 1 day has passed since last completion, reset streak
-        if (daysDiff > 1) {
+        const last = new Date(habit.lastCompleted);
+        const diff = Math.floor((today - last) / (1000 * 60 * 60 * 24));
+        if (diff > 1 && habit.streak > 0) {
+          hasChanges = true;
           return { ...habit, streak: 0 };
         }
       }
       return habit;
     });
-    updateUserData('habits', updatedHabits);
+
+    if (hasChanges) {
+      setHabits(updated);
+      updated.forEach(h => {
+        if (h.streak === 0 && habits.find(old => old.id === h.id).streak > 0) {
+          habitsAPI.update(h.id, { streak: 0 });
+        }
+      });
+    }
   };
 
-  // Check streak resets when component mounts
   useEffect(() => {
-    checkStreakReset();
-  }, []);
+    if (habits.length) checkStreakReset();
+  }, [habits]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
@@ -179,7 +160,7 @@ const HabitGarden = () => {
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Best Streak</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {Math.max(...habits.map(h => h.streak), 0)}
+                  {Math.max(...habits.map(h => h.streak || 0), 0)}
                 </p>
               </div>
               <Flame className="w-8 h-8 text-orange-600" />
@@ -210,36 +191,30 @@ const HabitGarden = () => {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add New Habit</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Habit Name
-                </label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Habit Name</label>
                 <input
                   type="text"
                   value={newHabit.name}
-                  onChange={(e) => setNewHabit({ ...newHabit, name: e.target.value })}
+                  onChange={e => setNewHabit({ ...newHabit, name: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="e.g., Drink 8 glasses of water"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Description (Optional)
-                </label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description (Optional)</label>
                 <input
                   type="text"
                   value={newHabit.description}
-                  onChange={(e) => setNewHabit({ ...newHabit, description: e.target.value })}
+                  onChange={e => setNewHabit({ ...newHabit, description: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="Why is this habit important?"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Frequency
-                </label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Frequency</label>
                 <select
                   value={newHabit.frequency}
-                  onChange={(e) => setNewHabit({ ...newHabit, frequency: e.target.value })}
+                  onChange={e => setNewHabit({ ...newHabit, frequency: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
                   <option value="daily">Daily</option>
@@ -251,15 +226,11 @@ const HabitGarden = () => {
                 <button
                   onClick={addHabit}
                   className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors"
-                >
-                  Add Habit
-                </button>
+                >Add Habit</button>
                 <button
                   onClick={() => setShowAddForm(false)}
                   className="bg-gray-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors"
-                >
-                  Cancel
-                </button>
+                >Cancel</button>
               </div>
             </div>
           </motion.div>
@@ -268,26 +239,16 @@ const HabitGarden = () => {
         {/* Habits List */}
         <div className="space-y-4">
           {habits.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
               <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Target className="w-12 h-12 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                No habits yet
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Start building positive habits to improve your student life!
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No habits yet</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">Start building positive habits to improve your student life!</p>
               <button
                 onClick={() => setShowAddForm(true)}
                 className="bg-green-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors"
-              >
-                Add Your First Habit
-              </button>
+              >Add Your First Habit</button>
             </motion.div>
           ) : (
             habits.map((habit, index) => (
@@ -296,39 +257,24 @@ const HabitGarden = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className={`bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 ${habit.completed ? 'ring-2 ring-green-500' : ''
-                  }`}
+                className={`bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 ${habit.completed ? 'ring-2 ring-green-500' : ''}`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <button
-                      onClick={() => toggleHabit(habit.id)}
-                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${habit.completed
-                        ? 'bg-green-500 border-green-500 text-white'
-                        : 'border-gray-300 dark:border-gray-600 hover:border-green-500'
-                        }`}
+                      onClick={() => toggleHabit(habit)}
+                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${habit.completed ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 dark:border-gray-600 hover:border-green-500'}`}
                     >
                       {habit.completed && <CheckCircle className="w-5 h-5" />}
                     </button>
                     <div>
-                      <h3 className={`text-lg font-semibold ${habit.completed ? 'line-through text-gray-500' : 'text-gray-900 dark:text-white'
-                        }`}>
-                        {habit.name}
-                      </h3>
-                      {habit.description && (
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">
-                          {habit.description}
-                        </p>
-                      )}
+                      <h3 className={`text-lg font-semibold ${habit.completed ? 'line-through text-gray-500' : 'text-gray-900 dark:text-white'}`}>{habit.name}</h3>
+                      {habit.description && (<p className="text-gray-600 dark:text-gray-400 text-sm">{habit.description}</p>)}
                       <div className="flex items-center space-x-4 mt-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {habit.frequency}
-                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">{habit.frequency}</span>
                         <div className="flex items-center space-x-1">
                           <Flame className="w-4 h-4 text-orange-500" />
-                          <span className="text-xs text-gray-600 dark:text-gray-400">
-                            {habit.streak} day streak
-                          </span>
+                          <span className="text-xs text-gray-600 dark:text-gray-400">{habit.streak || 0} day streak</span>
                         </div>
                       </div>
                     </div>
@@ -336,7 +282,7 @@ const HabitGarden = () => {
                   <div className="flex items-center space-x-2">
                     {habit.streak > 0 && (
                       <button
-                        onClick={() => resetStreak(habit.id)}
+                        onClick={() => resetStreak(habit)}
                         className="p-2 text-gray-400 hover:text-yellow-500 transition-colors"
                         title="Reset Streak"
                       >
@@ -345,7 +291,7 @@ const HabitGarden = () => {
                     )}
                     <button
                       onClick={() => deleteHabit(habit.id)}
-                      className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                      className="p-2 text-gray-400 hover:text-red-5 transition-colors"
                       title="Delete Habit"
                     >
                       <Trash2 className="w-4 h-4" />

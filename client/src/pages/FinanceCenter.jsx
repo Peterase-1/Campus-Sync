@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '../context/UserContext';
 import Navbar from '../components/Navbar';
@@ -8,80 +8,66 @@ import {
   TrendingUp,
   TrendingDown,
   Wallet,
-  Target,
-  Calendar,
-  Edit3,
   Trash2,
-  ArrowUp,
-  ArrowDown
 } from 'lucide-react';
+import { financeAPI } from '../utils/api';
 
 const FinanceCenter = () => {
-  const { user, updateUserData } = useUser();
+  const { user } = useUser();
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTransaction, setNewTransaction] = useState({
     type: 'expense',
     amount: '',
     description: '',
-    category: 'food'
+    category: 'food',
   });
+  const [transactions, setTransactions] = useState([]);
 
-  const finances = {
-    totalIncome: user?.data?.finances?.totalIncome || 0,
-    totalExpenses: user?.data?.finances?.totalExpenses || 0,
-    totalSavings: user?.data?.finances?.totalSavings || 0,
-    transactions: user?.data?.finances?.transactions || [],
-    goals: user?.data?.finances?.goals || []
-  };
+  // Load transactions from DB on mount
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const data = await financeAPI.getTransactions();
+        setTransactions(data);
+      } catch (e) {
+        console.error('Failed to load transactions', e);
+      }
+    };
+    fetchTransactions();
+  }, []);
 
-  const addTransaction = () => {
-    if (newTransaction.amount && newTransaction.description) {
-      const transaction = {
-        id: Date.now(),
-        type: newTransaction.type,
+  // Compute totals from transactions
+  const totalIncome = transactions
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = transactions
+    .filter(t => t.type === 'expense')
+    .reduce((sum, t) => sum + t.amount, 0);
+  const totalSavings = totalIncome - totalExpenses;
+
+  const addTransaction = async () => {
+    if (!newTransaction.amount || !newTransaction.description) return;
+    try {
+      const created = await financeAPI.createTransaction({
+        ...newTransaction,
         amount: parseFloat(newTransaction.amount),
-        description: newTransaction.description,
-        category: newTransaction.category,
-        date: new Date().toISOString()
-      };
-
-      const updatedTransactions = [...finances.transactions, transaction];
-      const totalIncome = updatedTransactions
-        .filter(t => t.type === 'income')
-        .reduce((sum, t) => sum + t.amount, 0);
-      const totalExpenses = updatedTransactions
-        .filter(t => t.type === 'expense')
-        .reduce((sum, t) => sum + t.amount, 0);
-
-      updateUserData('finances', {
-        ...finances,
-        transactions: updatedTransactions,
-        totalIncome,
-        totalExpenses,
-        totalSavings: totalIncome - totalExpenses
+        date: new Date().toISOString(),
       });
-
+      setTransactions(prev => [...prev, created]);
       setNewTransaction({ type: 'expense', amount: '', description: '', category: 'food' });
       setShowAddForm(false);
+    } catch (e) {
+      console.error('Failed to create transaction', e);
     }
   };
 
-  const deleteTransaction = (transactionId) => {
-    const updatedTransactions = finances.transactions.filter(t => t.id !== transactionId);
-    const totalIncome = updatedTransactions
-      .filter(t => t.type === 'income')
-      .reduce((sum, t) => sum + t.amount, 0);
-    const totalExpenses = updatedTransactions
-      .filter(t => t.type === 'expense')
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    updateUserData('finances', {
-      ...finances,
-      transactions: updatedTransactions,
-      totalIncome,
-      totalExpenses,
-      totalSavings: totalIncome - totalExpenses
-    });
+  const deleteTransaction = async (transactionId) => {
+    try {
+      await financeAPI.deleteTransaction(transactionId);
+      setTransactions(prev => prev.filter(t => t.id !== transactionId));
+    } catch (e) {
+      console.error('Failed to delete transaction', e);
+    }
   };
 
   const categories = [
@@ -91,7 +77,7 @@ const FinanceCenter = () => {
     { id: 'education', name: 'Education', color: 'bg-green-500' },
     { id: 'health', name: 'Health & Fitness', color: 'bg-pink-500' },
     { id: 'shopping', name: 'Shopping', color: 'bg-yellow-500' },
-    { id: 'other', name: 'Other', color: 'bg-gray-500' }
+    { id: 'other', name: 'Other', color: 'bg-gray-500' },
   ];
 
   return (
@@ -123,9 +109,7 @@ const FinanceCenter = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Income</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  ${(finances.totalIncome || 0).toFixed(2)}
-                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">${totalIncome.toFixed(2)}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-green-600" />
             </div>
@@ -140,9 +124,7 @@ const FinanceCenter = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Expenses</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  ${(finances.totalExpenses || 0).toFixed(2)}
-                </p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">${totalExpenses.toFixed(2)}</p>
               </div>
               <TrendingDown className="w-8 h-8 text-red-600" />
             </div>
@@ -157,10 +139,7 @@ const FinanceCenter = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Savings</p>
-                <p className={`text-2xl font-bold ${finances.totalSavings >= 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                  ${(finances.totalSavings || 0).toFixed(2)}
-                </p>
+                <p className={`text-2xl font-bold ${totalSavings >= 0 ? 'text-green-600' : 'text-red-600'}`}>${totalSavings.toFixed(2)}</p>
               </div>
               <Wallet className="w-8 h-8 text-blue-600" />
             </div>
@@ -190,12 +169,10 @@ const FinanceCenter = () => {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add Transaction</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Type
-                </label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
                 <select
                   value={newTransaction.type}
-                  onChange={(e) => setNewTransaction({ ...newTransaction, type: e.target.value })}
+                  onChange={e => setNewTransaction({ ...newTransaction, type: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="income">Income</option>
@@ -203,36 +180,30 @@ const FinanceCenter = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Amount
-                </label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount</label>
                 <input
                   type="number"
                   value={newTransaction.amount}
-                  onChange={(e) => setNewTransaction({ ...newTransaction, amount: e.target.value })}
+                  onChange={e => setNewTransaction({ ...newTransaction, amount: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Description
-                </label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
                 <input
                   type="text"
                   value={newTransaction.description}
-                  onChange={(e) => setNewTransaction({ ...newTransaction, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={e => setNewTransaction({ ...newTransaction, description: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-5 focus:border-transparent"
                   placeholder="What was this for?"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Category
-                </label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
                 <select
                   value={newTransaction.category}
-                  onChange={(e) => setNewTransaction({ ...newTransaction, category: e.target.value })}
+                  onChange={e => setNewTransaction({ ...newTransaction, category: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   {categories.map(category => (
@@ -242,20 +213,20 @@ const FinanceCenter = () => {
                   ))}
                 </select>
               </div>
-            </div>
-            <div className="flex space-x-3 mt-4">
-              <button
-                onClick={addTransaction}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors"
-              >
-                Add Transaction
-              </button>
-              <button
-                onClick={() => setShowAddForm(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors"
-              >
-                Cancel
-              </button>
+              <div className="flex space-x-3 mt-2">
+                <button
+                  onClick={addTransaction}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                >
+                  Add Transaction
+                </button>
+                <button
+                  onClick={() => setShowAddForm(false)}
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
@@ -263,21 +234,13 @@ const FinanceCenter = () => {
         {/* Transactions List */}
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Recent Transactions</h3>
-          {finances.transactions.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
+          {transactions.length === 0 ? (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
               <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                 <DollarSign className="w-12 h-12 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                No transactions yet
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Start tracking your income and expenses to manage your finances better!
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No transactions yet</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">Start tracking your income and expenses to manage your finances better!</p>
               <button
                 onClick={() => setShowAddForm(true)}
                 className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors"
@@ -286,7 +249,7 @@ const FinanceCenter = () => {
               </button>
             </motion.div>
           ) : (
-            finances.transactions
+            transactions
               .sort((a, b) => new Date(b.date) - new Date(a.date))
               .map((transaction, index) => {
                 const category = categories.find(c => c.id === transaction.category);
@@ -314,8 +277,7 @@ const FinanceCenter = () => {
                       </div>
                       <div className="flex items-center space-x-4">
                         <div className="text-right">
-                          <p className={`text-lg font-bold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                            }`}>
+                          <p className={`text-lg font-bold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                             {transaction.type === 'income' ? '+' : '-'}${(transaction.amount || 0).toFixed(2)}
                           </p>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
