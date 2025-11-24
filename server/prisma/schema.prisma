@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String               @id @default(uuid())
+  email        String               @unique
+  password     String
+  name         String
+  university   String
+  major        String
+  createdAt    DateTime             @default(now())
+  preferences  String?              // Stored as JSON string
+  habits       Habit[]
+  transactions FinanceTransaction[]
+  notes        StudyNote[]
+  tasks        StudyTask[]
+}
+
+model Habit {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  name          String
+  description   String?
+  frequency     String
+  completed     Boolean   @default(false)
+  streak        Int       @default(0)
+  createdAt     DateTime  @default(now())
+  lastCompleted DateTime?
+}
+
+model FinanceTransaction {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String // 'income' | 'expense'
+  amount      Float
+  description String
+  category    String
+  date        DateTime @default(now())
+}
+
+model StudyNote {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  content   String
+  subject   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StudyTask {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  title       String
+  description String?
+  priority    String // 'low' | 'medium' | 'high'
+  dueDate     DateTime?
+  completed   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
