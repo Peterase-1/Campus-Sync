@@ -1,37 +1,37 @@
-# Campus Sync 🎓
+# Campus Sync
 
 A comprehensive student management platform designed to help university students organize their academic life, track habits, manage finances, and stay on top of their studies.
 
 ![Campus Sync](https://img.shields.io/badge/version-1.0.0-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## 🌟 Features
+## Features
 
-### 📚 Study Desk
+### Study Desk
 - Create and organize study notes by subject
 - Manage study tasks with priority levels
 - Track deadlines and completion status
 - Organize study materials in one place
 
-### 🌱 Habit Garden
+### Habit Garden
 - Build and track positive habits
 - Monitor daily/weekly/monthly goals
 - Track streak counts for consistency
 - Visual progress indicators
 
-### 💰 Finance Center
+### Finance Center
 - Track income and expenses
 - Categorize transactions (Food, Transport, Education, etc.)
 - Monitor spending patterns
 - Calculate savings automatically
 
-### 🎯 Dashboard
+### Dashboard
 - Overview of all activities
 - Quick access to all features
 - Personalized statistics
 - Recent activity feed
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 Campus-Sync/
@@ -55,7 +55,7 @@ Campus-Sync/
 └── README.md
 ```
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **React 18** - UI library
@@ -74,7 +74,7 @@ Campus-Sync/
 - **JWT** - Authentication
 - **bcryptjs** - Password hashing
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js (v18 or higher)
@@ -130,7 +130,7 @@ Campus-Sync/
 
 3. **Visit** `http://localhost:5173` in your browser
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - Register new user
@@ -156,7 +156,7 @@ Campus-Sync/
 - `PATCH /api/study/tasks/:id` - Update task
 - `DELETE /api/study/tasks/:id` - Delete task
 
-## 🎨 Features in Detail
+## Features in Detail
 
 ### User Authentication
 - Secure JWT-based authentication
@@ -176,11 +176,11 @@ Campus-Sync/
 - Automatic migrations
 - Data validation
 
-## 🌙 Dark Mode
+## Dark Mode
 
 Campus Sync includes a built-in dark mode that automatically adapts to your system preferences or can be toggled manually.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -190,24 +190,24 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License.
 
-## 👨‍💻 Authors
+## Authors
 
-- **Peter Aseer** - [Peterase-1](https://github.com/Peterase-1)
+- **Petros Asegid** - [Peterase-1](https://github.com/Peterase-1)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - React team for the amazing framework
 - Prisma team for the excellent ORM
 - All contributors and supporters
 
-## 📧 Contact
+## Contact
 
 For questions or support, please open an issue on GitHub.
 
 ---
 
-**Made with ❤️ for students, by students**
+Made with love for students, by students
