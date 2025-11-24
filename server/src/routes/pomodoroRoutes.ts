@@ -6,9 +6,9 @@ const router = express.Router();
 
 router.use(authenticate);
 
+router.get('/stats', getStats);
 router.get('/', getSessions);
 router.post('/', createSession);
 router.patch('/:id/complete', completeSession);
-router.get('/stats', getStats);
 
 export default router;
