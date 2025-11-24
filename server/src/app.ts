@@ -13,12 +13,18 @@ import habitRoutes from './routes/habitRoutes';
 import financeRoutes from './routes/financeRoutes';
 import studyRoutes from './routes/studyRoutes';
 import goalRoutes from './routes/goalRoutes';
+import timetableRoutes from './routes/timetableRoutes';
+import pomodoroRoutes from './routes/pomodoroRoutes';
+import notesRoutes from './routes/notesRoutes';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/habits', habitRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/study', studyRoutes);
 app.use('/api/goals', goalRoutes);
+app.use('/api/timetable', timetableRoutes);
+app.use('/api/pomodoro', pomodoroRoutes);
+app.use('/api/notes', notesRoutes);
 
 app.get('/', (req, res) => {
   res.send('Campus Sync API is running');
