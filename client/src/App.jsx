@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import HabitGarden from './pages/HabitGarden';
 import FinanceCenter from './pages/FinanceCenter';
 import StudyDesk from './pages/StudyDesk';
+import Goals from './pages/Goals';
 
 function App() {
   return (
@@ -29,7 +30,7 @@ function App() {
                 <Route path="habits" element={<HabitGarden />} />
                 <Route path="finance" element={<FinanceCenter />} />
                 <Route path="desk" element={<StudyDesk />} />
-                <Route path="goals" element={<div className="p-8 text-center"><h1 className="text-2xl font-bold">Life Goals - Coming Soon! 🎯</h1></div>} />
+                <Route path="goals" element={<Goals />} />
               </Routes>
             } />
           </Routes>
