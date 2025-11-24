@@ -20,6 +20,20 @@ model User {
   transactions FinanceTransaction[]
   notes        StudyNote[]
   tasks        StudyTask[]
+  goals        Goal[]
+}
+
+model Goal {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  title       String
+  description String?
+  category    String    // 'personal' | 'academic' | 'career' | 'health'
+  targetDate  DateTime?
+  progress    Int       @default(0) // 0-100
+  completed   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
 }
 
 model Habit {
