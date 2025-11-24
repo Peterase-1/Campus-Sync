@@ -16,7 +16,9 @@ import {
   Star,
   LogOut,
   User as UserIcon,
-  Settings
+  Settings,
+  Timer,
+  StickyNote
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -35,6 +37,8 @@ const Navbar = () => {
     { name: 'Finance', href: '/app/finance', icon: DollarSign, color: 'from-green-500 to-green-600' },
     { name: 'Study Desk', href: '/app/desk', icon: BookOpen, color: 'from-green-500 to-green-600' },
     { name: 'Goals', href: '/app/goals', icon: Star, color: 'from-green-500 to-green-600' },
+    { name: 'Pomodoro', href: '/app/pomodoro', icon: Timer, color: 'from-green-500 to-green-600' },
+    { name: 'Notes', href: '/app/notes', icon: StickyNote, color: 'from-green-500 to-green-600' },
   ];
 
   const isActive = (path) => location.pathname === path;
