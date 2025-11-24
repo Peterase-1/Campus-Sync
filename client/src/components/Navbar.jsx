@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../context/UserContext';
 import {
@@ -9,21 +9,24 @@ import {
   Menu,
   X,
   Sparkles,
-  Zap,
-  Brain,
-  Heart,
   Home,
   Target,
   DollarSign,
   BookOpen,
-  Star
+  Star,
+  LogOut,
+  User as UserIcon,
+  Settings
 } from 'lucide-react';
 
 const Navbar = () => {
   const { theme, toggleTheme, isDark } = useTheme();
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileRef = useRef(null);
 
   const navigation = [
     { name: 'Dashboard', href: '/app', icon: Sparkles, color: 'from-green-500 to-green-600' },
@@ -34,6 +37,29 @@ const Navbar = () => {
   ];
 
   const isActive = (path) => location.pathname === path;
+
+  // Close profile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+    setProfileMenuOpen(false);
+  };
+
+  const handleProfileClick = () => {
+    navigate('/app/profile');
+    setProfileMenuOpen(false);
+  };
 
   return (
     <nav className="sticky top-0 z-50 glass backdrop-blur-xl border-b border-white/20">
@@ -88,15 +114,61 @@ const Navbar = () => {
               {isDark ? <Sun size={18} className="text-slate-600 dark:text-slate-300" /> : <Moon size={18} className="text-slate-600 dark:text-slate-300" />}
             </motion.button>
 
-            {/* User Avatar */}
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              className="w-10 h-10 bg-green-600 rounded-2xl flex items-center justify-center shadow-lg"
-            >
-              <span className="text-white font-bold text-sm">
-                {user?.name ? user.name.charAt(0).toUpperCase() : 'S'}
-              </span>
-            </motion.div>
+            {/* User Avatar with Dropdown */}
+            <div className="relative" ref={profileRef}>
+              <motion.button
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                className="w-10 h-10 bg-green-600 rounded-2xl flex items-center justify-center shadow-lg cursor-pointer"
+              >
+                <span className="text-white font-bold text-sm">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </span>
+              </motion.button>
+
+              {/* Profile Dropdown */}
+              <AnimatePresence>
+                {profileMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+                  >
+                    {/* User Info */}
+                    <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                        {user?.name || 'User'}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {user?.email || 'user@example.com'}
+                      </p>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="py-2">
+                      <button
+                        onClick={handleProfileClick}
+                        className="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <UserIcon className="w-4 h-4 mr-3" />
+                        Profile Settings
+                      </button>
+
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4 mr-3" />
+                        Logout
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Mobile menu button */}
             <button
@@ -136,8 +208,8 @@ const Navbar = () => {
                 </Link>
               ))}
 
-              {/* Mobile Home Link */}
-              <Link to="/" onClick={() => setMobileMenuOpen(false)}>
+              {/* Mobile Profile & Logout */}
+              <Link to="/app/profile" onClick={() => setMobileMenuOpen(false)}>
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -146,10 +218,30 @@ const Navbar = () => {
                   whileTap={{ scale: 0.98 }}
                   className="flex items-center px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-white/30 dark:hover:bg-white/10 transition-all duration-300"
                 >
-                  <Home className="w-5 h-5 mr-3" />
-                  <span className="font-medium">Back to Home</span>
+                  <UserIcon className="w-5 h-5 mr-3" />
+                  <span className="font-medium">Profile Settings</span>
                 </motion.div>
               </Link>
+
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full"
+              >
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: (navigation.length + 1) * 0.1 }}
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center px-4 py-3 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300"
+                >
+                  <LogOut className="w-5 h-5 mr-3" />
+                  <span className="font-medium">Logout</span>
+                </motion.div>
+              </button>
             </div>
           </motion.div>
         )}

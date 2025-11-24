@@ -12,6 +12,7 @@ import HabitGarden from './pages/HabitGarden';
 import FinanceCenter from './pages/FinanceCenter';
 import StudyDesk from './pages/StudyDesk';
 import Goals from './pages/Goals';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
                 <Route path="finance" element={<FinanceCenter />} />
                 <Route path="desk" element={<StudyDesk />} />
                 <Route path="goals" element={<Goals />} />
+                <Route path="profile" element={<Profile />} />
               </Routes>
             } />
           </Routes>
