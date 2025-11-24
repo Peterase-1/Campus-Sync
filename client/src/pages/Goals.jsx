@@ -138,15 +138,58 @@ const Goals = () => {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center gap-2">
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="mb-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2"
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center gap-2"
+          >
+            <AlertCircle className="w-5 h-5 text-red-600" />
+            <span className="text-red-600 dark:text-red-400">{error}</span>
+          </motion.div>
+        )}
+
+        {/* Category Filter */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-6 flex flex-wrap gap-2"
         >
-            <Plus className="w-5 h-5" />
-            <span>Add New Goal</span>
-          </motion.button>
+          {categories.map((cat, index) => {
+            const Icon = cat.icon;
+            return (
+              <motion.button
+                key={cat.value}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 + index * 0.05 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedCategory(cat.value)}
+                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${selectedCategory === cat.value
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+              >
+                <Icon className="w-4 h-4" />
+                {cat.label}
+              </motion.button>
+            );
+          })}
+        </motion.div>
+
+        {/* Add Goal Button */}
+        <motion.button
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="mb-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2"
+        >
+          <Plus className="w-5 h-5" />
+          <span>Add New Goal</span>
+        </motion.button>
 
         {/* Add Goal Form */}
         {showAddForm && (
@@ -304,8 +347,8 @@ const Goals = () => {
                       <button
                         onClick={() => toggleGoalComplete(goal.id, goal.completed)}
                         className={`p-2 rounded-lg transition-colors ${goal.completed
-                          ? 'bg-green-100 text-green-600 dark:bg-green-900/20'
-                          : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                            ? 'bg-green-100 text-green-600 dark:bg-green-900/20'
+                            : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                           }`}
                       >
                         <CheckCircle2 className="w-5 h-5" />
