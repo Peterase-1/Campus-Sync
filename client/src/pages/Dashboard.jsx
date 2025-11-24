@@ -71,7 +71,7 @@ const Dashboard = () => {
     try {
       const [habits, finance, study, goals, pomodoro] = await Promise.all([
         habitsAPI.getAll().catch(() => []),
-        financeAPI.getAll().catch(() => []),
+        financeAPI.getTransactions().catch(() => []),
         studyAPI.getNotes().catch(() => []),
         goalsAPI.getAll().catch(() => []),
         pomodoroAPI.getStats().catch(() => ({ totalSessions: 0, totalHours: 0 }))
