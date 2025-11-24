@@ -65,6 +65,25 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchAllData();
+
+    // Auto-refresh every 30 seconds
+    const intervalId = setInterval(() => {
+      fetchAllData();
+    }, 30000);
+
+    // Refresh when user returns to tab
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchAllData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const fetchAllData = async () => {
