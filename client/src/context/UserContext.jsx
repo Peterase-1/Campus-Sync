@@ -9,10 +9,16 @@ export const UserProvider = ({ children }) => {
   // Load user from token on mount
   useEffect(() => {
     const token = localStorage.getItem('campusSyncToken');
-    const savedUser = localStorage.getItem('cumpasSyncUser');
 
-    if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
+    if (token) {
+      // Decode JWT to get user info (without verification - just for display)
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setUser(payload);
+      } catch (e) {
+        console.error('Invalid token');
+        localStorage.removeItem('campusSyncToken');
+      }
     }
     setIsLoading(false);
   }, []);
@@ -22,12 +28,14 @@ export const UserProvider = ({ children }) => {
       const { authAPI } = await import('../utils/api');
       const response = await authAPI.register(userData);
 
-      // Store token and user
+      // Store only token
       localStorage.setItem('campusSyncToken', response.token);
-      localStorage.setItem('cumpasSyncUser', JSON.stringify(response.user));
-      setUser(response.user);
 
-      return response.user;
+      // Decode user from token
+      const payload = JSON.parse(atob(response.token.split('.')[1]));
+      setUser(payload);
+
+      return payload;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -39,12 +47,14 @@ export const UserProvider = ({ children }) => {
       const { authAPI } = await import('../utils/api');
       const response = await authAPI.login(email, password);
 
-      // Store token and user
+      // Store only token
       localStorage.setItem('campusSyncToken', response.token);
-      localStorage.setItem('cumpasSyncUser', JSON.stringify(response.user));
-      setUser(response.user);
 
-      return response.user;
+      // Decode user from token
+      const payload = JSON.parse(atob(response.token.split('.')[1]));
+      setUser(payload);
+
+      return payload;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -54,7 +64,7 @@ export const UserProvider = ({ children }) => {
   const updateUser = (updates) => {
     const updatedUser = { ...user, ...updates };
     setUser(updatedUser);
-    localStorage.setItem('cumpasSyncUser', JSON.stringify(updatedUser));
+    // No localStorage update - rely on backend
   };
 
   const updateUserData = (section, data) => {
@@ -66,13 +76,13 @@ export const UserProvider = ({ children }) => {
       }
     };
     setUser(updatedUser);
-    localStorage.setItem('cumpasSyncUser', JSON.stringify(updatedUser));
+    // No localStorage update - rely on backend
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('campusSyncToken');
-    localStorage.removeItem('cumpasSyncUser');
+    // No need to remove cumpasSyncUser - we don't store it anymore
   };
 
   const value = {
