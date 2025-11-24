@@ -118,4 +118,72 @@ export const goalsAPI = {
   },
 };
 
+// Timetable API
+export const timetableAPI = {
+  getAll: async () => {
+    const response = await api.get('/timetable');
+    return response.data;
+  },
+  create: async (classData) => {
+    const response = await api.post('/timetable', classData);
+    return response.data;
+  },
+  update: async (id, updates) => {
+    const response = await api.patch(`/timetable/${id}`, updates);
+    return response.data;
+  },
+  delete: async (id) => {
+    const response = await api.delete(`/timetable/${id}`);
+    return response.data;
+  },
+  getAttendance: async (classId) => {
+    const response = await api.get(`/timetable/${classId}/attendance`);
+    return response.data;
+  },
+  markAttendance: async (attendanceData) => {
+    const response = await api.post('/timetable/attendance', attendanceData);
+    return response.data;
+  },
+};
+
+// Pomodoro API
+export const pomodoroAPI = {
+  getSessions: async () => {
+    const response = await api.get('/pomodoro');
+    return response.data;
+  },
+  createSession: async (sessionData) => {
+    const response = await api.post('/pomodoro', sessionData);
+    return response.data;
+  },
+  completeSession: async (id) => {
+    const response = await api.patch(`/pomodoro/${id}/complete`);
+    return response.data;
+  },
+  getStats: async () => {
+    const response = await api.get('/pomodoro/stats');
+    return response.data;
+  },
+};
+
+// Notes API
+export const notesAPI = {
+  getAll: async (archived = false) => {
+    const response = await api.get(`/notes?archived=${archived}`);
+    return response.data;
+  },
+  create: async (noteData) => {
+    const response = await api.post('/notes', noteData);
+    return response.data;
+  },
+  update: async (id, updates) => {
+    const response = await api.patch(`/notes/${id}`, updates);
+    return response.data;
+  },
+  delete: async (id) => {
+    const response = await api.delete(`/notes/${id}`);
+    return response.data;
+  },
+};
+
 export default api;
