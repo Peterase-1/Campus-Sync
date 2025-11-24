@@ -98,4 +98,24 @@ export const studyAPI = {
   },
 };
 
+// Goals API
+export const goalsAPI = {
+  getAll: async () => {
+    const response = await api.get('/goals');
+    return response.data;
+  },
+  create: async (goalData) => {
+    const response = await api.post('/goals', goalData);
+    return response.data;
+  },
+  update: async (id, updates) => {
+    const response = await api.patch(`/goals/${id}`, updates);
+    return response.data;
+  },
+  delete: async (id) => {
+    const response = await api.delete(`/goals/${id}`);
+    return response.data;
+  },
+};
+
 export default api;
