@@ -1,31 +1,23 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import {
-  User,
   Mail,
-  GraduationCap,
-  BookOpen,
+  Lock,
   ArrowRight,
-  CheckCircle,
-  Sparkles,
+  AlertCircle,
   Shield,
   Zap,
-  Lock,
-  AlertCircle
+  Sparkles
 } from 'lucide-react';
 
-const CreateAccount = () => {
+const Login = () => {
   const navigate = useNavigate();
-  const { createAccount } = useUser();
+  const { login } = useUser();
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
-    password: '',
-    confirmPassword: '',
-    university: '',
-    major: ''
+    password: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -33,24 +25,13 @@ const CreateAccount = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      await createAccount(formData);
+      await login(formData.email, formData.password);
       navigate('/app');
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+      setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
       setIsSubmitting(false);
     }
   };
@@ -111,11 +92,11 @@ const CreateAccount = () => {
               <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-400 rounded-full animate-pulse"></div>
             </div>
           </div>
-          <h1 className="text-3xl font-bold gradient-text mb-2">Create Your Account</h1>
-          <p className="text-gray-600 dark:text-gray-300">Join thousands of students managing their academic life</p>
+          <h1 className="text-3xl font-bold gradient-text mb-2">Welcome Back</h1>
+          <p className="text-gray-600 dark:text-gray-300">Sign in to continue managing your academic life</p>
         </motion.div>
 
-        {/* Account Creation Form */}
+        {/* Login Form */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -123,25 +104,6 @@ const CreateAccount = () => {
           className="card"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Name Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="input pl-10"
-                  placeholder="Enter your full name"
-                />
-              </div>
-            </div>
-
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -180,63 +142,6 @@ const CreateAccount = () => {
               </div>
             </div>
 
-            {/* Confirm Password Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  className="input pl-10"
-                  placeholder="Confirm your password"
-                />
-              </div>
-            </div>
-
-            {/* University Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                University
-              </label>
-              <div className="relative">
-                <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  name="university"
-                  value={formData.university}
-                  onChange={handleChange}
-                  required
-                  className="input pl-10"
-                  placeholder="Enter your university"
-                />
-              </div>
-            </div>
-
-            {/* Major Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Major/Field of Study
-              </label>
-              <div className="relative">
-                <BookOpen className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  name="major"
-                  value={formData.major}
-                  onChange={handleChange}
-                  required
-                  className="input pl-10"
-                  placeholder="Enter your major"
-                />
-              </div>
-            </div>
-
             {/* Error Message */}
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-2">
@@ -256,39 +161,24 @@ const CreateAccount = () => {
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Creating Account...
+                  Signing In...
                 </div>
               ) : (
                 <div className="flex items-center justify-center">
-                  Create Account
+                  Sign In
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </div>
               )}
             </motion.button>
-          </form>
 
-          {/* Benefits */}
-          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">What you'll get:</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Personalized dashboard</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Habit tracking system</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Finance management tools</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Study organization features</span>
-              </div>
-            </div>
-          </div>
+            {/* Sign Up Link */}
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+              Don't have an account?{' '}
+              <Link to="/create-account" className="text-green-600 hover:text-green-700 font-medium">
+                Create Account
+              </Link>
+            </p>
+          </form>
         </motion.div>
 
         {/* Trust Indicators */}
@@ -318,5 +208,4 @@ const CreateAccount = () => {
   );
 };
 
-export default CreateAccount;
-
+export default Login;

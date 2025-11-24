@@ -6,77 +6,80 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user from localStorage on mount
+  // Load user from token on mount
   useEffect(() => {
+    const token = localStorage.getItem('campusSyncToken');
     const savedUser = localStorage.getItem('cumpasSyncUser');
-    if (savedUser) {
+
+    if (token && savedUser) {
       setUser(JSON.parse(savedUser));
     }
     setIsLoading(false);
   }, []);
 
-  // Save user to localStorage whenever user changes
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('cumpasSyncUser', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('cumpasSyncUser');
-    }
-  }, [user]);
+  const createAccount = async (userData) => {
+    try {
+      const { authAPI } = await import('../utils/api');
+      const response = await authAPI.register(userData);
 
-  const createAccount = (userData) => {
-    const newUser = {
-      id: Date.now().toString(),
-      name: userData.name,
-      email: userData.email,
-      university: userData.university,
-      major: userData.major,
-      createdAt: new Date().toISOString(),
-      preferences: {
-        theme: 'light',
-        notifications: true,
-        language: 'en'
-      },
-      data: {
-        habits: [],
-        finances: {
-          transactions: [],
-          goals: []
-        },
-        studies: {
-          notes: [],
-          tasks: [],
-          resources: []
-        },
-        goals: []
-      }
-    };
-    setUser(newUser);
-    return newUser;
+      // Store token and user
+      localStorage.setItem('campusSyncToken', response.token);
+      localStorage.setItem('cumpasSyncUser', JSON.stringify(response.user));
+      setUser(response.user);
+
+      return response.user;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
+  };
+
+  const login = async (email, password) => {
+    try {
+      const { authAPI } = await import('../utils/api');
+      const response = await authAPI.login(email, password);
+
+      // Store token and user
+      localStorage.setItem('campusSyncToken', response.token);
+      localStorage.setItem('cumpasSyncUser', JSON.stringify(response.user));
+      setUser(response.user);
+
+      return response.user;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const updateUser = (updates) => {
-    setUser(prev => ({ ...prev, ...updates }));
+    const updatedUser = { ...user, ...updates };
+    setUser(updatedUser);
+    localStorage.setItem('cumpasSyncUser', JSON.stringify(updatedUser));
   };
 
   const updateUserData = (section, data) => {
-    setUser(prev => ({
-      ...prev,
+    const updatedUser = {
+      ...user,
       data: {
-        ...prev.data,
+        ...user.data,
         [section]: data
       }
-    }));
+    };
+    setUser(updatedUser);
+    localStorage.setItem('cumpasSyncUser', JSON.stringify(updatedUser));
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('campusSyncToken');
+    localStorage.removeItem('cumpasSyncUser');
   };
 
   const value = {
     user,
     isLoading,
     createAccount,
+    login,
     updateUser,
     updateUserData,
     logout,

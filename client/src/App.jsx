@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { UserProvider } from './context/UserContext';
 import Landing from './pages/Landing';
+import Login from './pages/Login';
 import CreateAccount from './pages/CreateAccount';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -18,6 +19,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/create-account" element={<CreateAccount />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
