@@ -8,7 +8,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Routes will be added here
+import authRoutes from './routes/authRoutes';
+import habitRoutes from './routes/habitRoutes';
+import financeRoutes from './routes/financeRoutes';
+import studyRoutes from './routes/studyRoutes';
+
+app.use('/api/auth', authRoutes);
+app.use('/api/habits', habitRoutes);
+app.use('/api/finance', financeRoutes);
+app.use('/api/study', studyRoutes);
+
 app.get('/', (req, res) => {
   res.send('Campus Sync API is running');
 });
