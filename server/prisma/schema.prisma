@@ -15,12 +15,16 @@ model User {
   university   String
   major        String
   createdAt    DateTime             @default(now())
-  preferences  String?              // Stored as JSON string
-  habits       Habit[]
-  transactions FinanceTransaction[]
-  notes        StudyNote[]
-  tasks        StudyTask[]
-  goals        Goal[]
+  preferences       String?              // Stored as JSON string
+  habits            Habit[]
+  transactions      FinanceTransaction[]
+  notes             StudyNote[]
+  tasks             StudyTask[]
+  goals             Goal[]
+  classes           Class[]
+  attendance        Attendance[]
+  pomodoroSessions  PomodoroSession[]
+  quickNotes        QuickNote[]
 }
 
 model Goal {
@@ -81,4 +85,59 @@ model StudyTask {
   dueDate     DateTime?
   completed   Boolean   @default(false)
   createdAt   DateTime  @default(now())
+}
+
+model Class {
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+  name        String
+  code        String?
+  professor   String?
+  location    String?
+  dayOfWeek   Int // 0-6 (Sun-Sat)
+  startTime   String // HH:MM format
+  endTime     String
+  color       String       @default("#10b981")
+  semester    String?
+  credits     Int?
+  createdAt   DateTime     @default(now())
+  attendance  Attendance[]
+}
+
+model Attendance {
+  id      String   @id @default(uuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id])
+  classId String
+  class   Class    @relation(fields: [classId], references: [id])
+  date    DateTime
+  present Boolean
+  notes   String?
+}
+
+model PomodoroSession {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  taskName  String?
+  duration  Int // minutes
+  completed Boolean   @default(false)
+  type      String // 'work' | 'break'
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+}
+
+model QuickNote {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  content   String // Markdown or rich text
+  tags      String[] // Array of tags
+  pinned    Boolean  @default(false)
+  archived  Boolean  @default(false)
+  color     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
