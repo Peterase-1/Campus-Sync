@@ -1,365 +1,393 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { mot ion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import Navbar from '../components/Navbar';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import {
-  Sparkles,
-  Zap,
-  TrendingUp,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+import {
   Target,
   DollarSign,
   BookOpen,
+  Star,
+  Clock,
+  TrendingUp,
   Calendar,
   CheckCircle,
-  AlertCircle,
-  Star,
-  Brain,
-  Rocket,
-  Shield,
-  Heart,
-  Lightbulb,
-  Award,
-  Users,
-  BarChart3,
-  Clock,
-  Globe,
-  Plus,
-  Edit3,
-  Trash2,
-  MoreHorizontal,
-  Bell,
-  Settings,
-  LogOut,
-  ChevronRight,
-  Activity,
-  PieChart,
-  TrendingDown,
-  ArrowUp,
-  ArrowDown
+  Timer,
+  StickyNote
 } from 'lucide-react';
+import { habitsAPI, financeAPI, studyAPI, goalsAPI, pomodoroAPI } from '../utils/api';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const Dashboard = () => {
-  const { user, updateUserData } = useUser();
+  const { user } = useUser();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [stats, setStats] = useState({
+    habits: 0,
+    completedHabits: 0,
+    totalExpenses: 0,
+    totalIncome: 0,
+    studyNotes: 0,
+    goals: 0,
+    completedGoals: 0,
+    pomodoroSessions: 0,
+    focusHours: 0
+  });
+  const [habitData, setHabitData] = useState([]);
+  const [financeData, setFinanceData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Calculate user progress
-  const totalHabits = user?.data?.habits?.length || 0;
-  const completedHabits = user?.data?.habits?.filter(h => h.completed)?.length || 0;
-  const totalSavings = user?.data?.finances?.totalSavings || 0;
-  const monthlyGoal = user?.data?.finances?.monthlyGoal || 1000;
-  const studyNotes = user?.data?.studies?.notes?.length || 0;
-  const activeGoals = user?.data?.goals?.length || 0;
+  useEffect(() => {
+    fetchAllData();
+  }, []);
 
-  const stats = [
+  const fetchAllData = async () => {
+    try {
+      const [habits, finance, study, goals, pomodoro] = await Promise.all([
+        habitsAPI.getAll().catch(() => []),
+        financeAPI.getAll().catch(() => []),
+        studyAPI.getNotes().catch(() => []),
+        goalsAPI.getAll().catch(() => []),
+        pomodoroAPI.getStats().catch(() => ({ totalSessions: 0, totalHours: 0 }))
+      ]);
+
+      setHabitData(habits);
+      setFinanceData(finance);
+
+      const income = finance.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+      const expenses = finance.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+
+      setStats({
+        habits: habits.length,
+        completedHabits: habits.filter(h => h.completed).length,
+        totalExpenses: expenses,
+        totalIncome: income,
+        studyNotes: study.length,
+        goals: goals.length,
+        completedGoals: goals.filter(g => g.completed).length,
+        pomodoroSessions: pomodoro.totalSessions || 0,
+        focusHours: pomodoro.totalHours || 0
+      });
+
+      setIsLoading(false);
+    } catch (err) {
+      console.error('Failed to fetch dashboard data:', err);
+      setIsLoading(false);
+    }
+  };
+
+  // Habit Completion Chart Data
+  const habitChartData = {
+    labels: ['Completed', 'Pending'],
+    datasets: [{
+      data: [stats.completedHabits, stats.habits - stats.completedHabits],
+      backgroundColor: ['#10b981', '#e5e7eb'],
+      borderWidth: 0,
+    }]
+  };
+
+  // Finance Overview Chart Data
+  const financeChartData = {
+    labels: ['Income', 'Expenses', 'Savings'],
+    datasets: [{
+      data: [stats.totalIncome, stats.totalExpenses, stats.totalIncome - stats.totalExpenses],
+      backgroundColor: ['#10b981', '#ef4444', '#3b82f6'],
+      borderWidth: 0,
+    }]
+  };
+
+  // Weekly Study Time (mock data - you can enhance this)
+  const studyTimeData = {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    datasets: [{
+      label: 'Focus Hours',
+      data: [2.5, 3, 1.5, 4, 2, 3.5, 1],
+      backgroundColor: 'rgba(16, 185, 129, 0.2)',
+      borderColor: '#10b981',
+      borderWidth: 2,
+      fill: true,
+      tension: 0.4,
+    }]
+  };
+
+  const quickStats = [
     {
       title: 'Active Habits',
-      value: totalHabits,
-      change: totalHabits > 0 ? `${Math.round((completedHabits / totalHabits) * 100)}% completed` : 'Start building habits',
+      value: stats.habits,
+      subtitle: `${stats.completedHabits} completed`,
       icon: Target,
-      color: 'text-emerald-500',
-      bgColor: 'bg-gradient-to-br from-emerald-50 to-green-100 dark:from-emerald-900/20 dark:to-green-900/20',
-      gradient: 'from-emerald-500 to-green-500',
-      progress: totalHabits > 0 ? (completedHabits / totalHabits) * 100 : 0
+      color: 'from-green-500 to-emerald-500',
+      onClick: () => navigate('/app/habits')
     },
     {
-      title: 'Total Savings',
-      value: `$${totalSavings}`,
-      change: totalSavings > 0 ? `${Math.round((totalSavings / monthlyGoal) * 100)}% of monthly goal` : 'Start saving today',
+      title: 'Balance',
+      value: `$${stats.totalIncome - stats.totalExpenses}`,
+      subtitle: `$${stats.totalIncome} income`,
       icon: DollarSign,
-      color: 'text-blue-500',
-      bgColor: 'bg-gradient-to-br from-blue-50 to-cyan-100 dark:from-blue-900/20 dark:to-cyan-900/20',
-      gradient: 'from-blue-500 to-cyan-500',
-      progress: totalSavings > 0 ? Math.min((totalSavings / monthlyGoal) * 100, 100) : 0
+      color: 'from-blue-500 to-cyan-500',
+      onClick: () => navigate('/app/finance')
     },
     {
       title: 'Study Notes',
-      value: studyNotes,
-      change: studyNotes > 0 ? 'Keep learning!' : 'Create your first note',
+      value: stats.studyNotes,
+      subtitle: 'Keep learning',
       icon: BookOpen,
-      color: 'text-purple-500',
-      bgColor: 'bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20',
-      gradient: 'from-purple-500 to-pink-500',
-      progress: studyNotes > 0 ? Math.min(studyNotes * 10, 100) : 0
+      color: 'from-purple-500 to-pink-500',
+      onClick: () => navigate('/app/desk')
     },
     {
-      title: 'Active Goals',
-      value: activeGoals,
-      change: activeGoals > 0 ? 'Keep pushing!' : 'Set your first goal',
-      icon: CheckCircle,
-      color: 'text-orange-500',
-      bgColor: 'bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-900/20 dark:to-amber-900/20',
-      gradient: 'from-orange-500 to-amber-500',
-      progress: activeGoals > 0 ? Math.min(activeGoals * 20, 100) : 0
-    }
-  ];
-
-  const recentActivities = user?.data?.recentActivities || [
-    { id: 1, action: 'Welcome to Cumpas Sync!', time: 'Just now', icon: Sparkles, clickable: false },
-    { id: 2, action: 'Start building your first habit', time: 'Get started', icon: Target, clickable: true, navigate: () => navigate('/app/habits') },
-    { id: 3, action: 'Create your first study note', time: 'Get started', icon: BookOpen, clickable: true, navigate: () => navigate('/app/desk') },
-    { id: 4, action: 'Set your first goal', time: 'Get started', icon: Star, clickable: true, navigate: () => navigate('/app/goals') },
-  ];
-
-  const quickActions = [
-    {
-      name: 'Add New Habit',
-      icon: Target,
-      color: 'bg-gradient-to-r from-emerald-500 to-green-500',
-      hover: 'hover:from-emerald-600 hover:to-green-600',
-      action: () => navigate('/app/habits')
-    },
-    {
-      name: 'Log Expense',
-      icon: DollarSign,
-      color: 'bg-gradient-to-r from-blue-500 to-cyan-500',
-      hover: 'hover:from-blue-600 hover:to-cyan-600',
-      action: () => navigate('/app/finance')
-    },
-    {
-      name: 'Create Note',
-      icon: BookOpen,
-      color: 'bg-gradient-to-r from-purple-500 to-pink-500',
-      hover: 'hover:from-purple-600 hover:to-pink-600',
-      action: () => navigate('/app/desk')
-    },
-    {
-      name: 'Set Goal',
+      title: 'Goals',
+      value: `${stats.completedGoals}/${stats.goals}`,
+      subtitle: 'Completed',
       icon: Star,
-      color: 'bg-gradient-to-r from-orange-500 to-amber-500',
-      hover: 'hover:from-orange-600 hover:to-amber-600',
-      action: () => navigate('/app/goals')
+      color: 'from-orange-500 to-amber-500',
+      onClick: () => navigate('/app/goals')
     },
-  ];
-
-  const tabs = [
-    { id: 'overview', name: 'Overview', icon: BarChart3, action: () => setActiveTab('overview') },
-    { id: 'habits', name: 'Habits', icon: Target, action: () => navigate('/app/habits') },
-    { id: 'finance', name: 'Finance', icon: DollarSign, action: () => navigate('/app/finance') },
-    { id: 'studies', name: 'Studies', icon: BookOpen, action: () => navigate('/app/desk') },
-    { id: 'goals', name: 'Goals', icon: Star, action: () => navigate('/app/goals') },
-  ];
-
-  // Handle stat card clicks
-  const handleStatClick = (statTitle) => {
-    switch (statTitle) {
-      case 'Active Habits':
-        navigate('/app/habits');
-        break;
-      case 'Total Savings':
-        navigate('/app/finance');
-        break;
-      case 'Study Notes':
-        navigate('/app/desk');
-        break;
-      case 'Active Goals':
-        navigate('/app/goals');
-        break;
-      default:
-        break;
+    {
+      title: 'Focus Time',
+      value: `${stats.focusHours}h`,
+      subtitle: `${stats.pomodoroSessions} sessions`,
+      icon: Timer,
+      color: 'from-red-500 to-rose-500',
+      onClick: () => navigate('/app/pomodoro')
     }
-  };
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="inline-block w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       <Navbar />
-      <div className="p-4 space-y-4">
-        {/* Navigation Tabs */}
+      <div className="p-6">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex gap-1 sm:gap-2 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 sm:p-2 overflow-x-auto scrollbar-hide"
+          className="mb-8"
         >
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={tab.action}
-              className={`flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${activeTab === tab.id
-                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                }`}
-            >
-              <tab.icon className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span>{tab.name}</span>
-            </button>
-          ))}
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Welcome back, {user?.name || 'Student'}! 👋
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Here's your productivity overview for today
+          </p>
         </motion.div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {stats.map((stat, index) => (
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+          {quickStats.map((stat, index) => (
             <motion.div
               key={stat.title}
-              initial={{ opacity: 0, y: 30, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ y: -5, scale: 1.02 }}
-              className={`${stat.bgColor} rounded-2xl p-3 sm:p-4 relative overflow-hidden group cursor-pointer hover:shadow-lg transition-all duration-300`}
-              onClick={() => handleStatClick(stat.title)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+              onClick={stat.onClick}
+              className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer"
             >
-              {/* Progress Bar */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${stat.progress}%` }}
-                  transition={{ duration: 1, delay: index * 0.1 + 0.5 }}
-                  className={`h-full bg-gradient-to-r ${stat.gradient} rounded-full`}
-                />
+              <div className={`w-12 h-12 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mb-3`}>
+                <stat.icon className="w-6 h-6 text-white" />
               </div>
-
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 bg-gradient-to-r ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg`}>
-                  <stat.icon className="w-6 h-6 text-white" />
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500 dark:text-gray-400">{stat.change}</span>
-                <div className="flex items-center space-x-1">
-                  {stat.progress > 0 ? (
-                    <TrendingUp className="w-4 h-4 text-emerald-500" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-gray-400" />
-                  )}
-                </div>
-              </div>
+              <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-1">{stat.title}</h3>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{stat.value}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{stat.subtitle}</p>
             </motion.div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Recent Activity */}
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Habit Completion Chart */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700"
+            transition={{ delay: 0.5 }}
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Recent Activity</h3>
-              <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-                <Clock className="w-4 h-4" />
-                <span>Live updates</span>
-              </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Target className="w-5 h-5 text-green-600" />
+              Habit Completion
+            </h3>
+            <div className="h-64 flex items-center justify-center">
+              {stats.habits > 0 ? (
+                <Doughnut
+                  data={habitChartData}
+                  options={{
+                    plugins: {
+                      legend: { display: true, position: 'bottom' },
+                    },
+                    maintainAspectRatio: false
+                  }}
+                />
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400 text-center">
+                  No habits yet.<br />Start building habits!
+                </p>
+              )}
             </div>
-            <div className="space-y-4">
-              {recentActivities.map((activity, index) => (
-                <motion.div
-                  key={activity.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-                  className={`flex items-center space-x-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors group ${activity.clickable ? 'cursor-pointer' : ''
-                    }`}
-                  onClick={activity.clickable ? activity.navigate : undefined}
-                >
-                  <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
-                    <activity.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900 dark:text-white">{activity.action}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{activity.time}</p>
-                  </div>
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                </motion.div>
-              ))}
+          </motion.div>
+
+          {/* Finance Overview Chart */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-blue-600" />
+              Finance Overview
+            </h3>
+            <div className="h-64 flex items-center justify-center">
+              {financeData.length > 0 ? (
+                <Doughnut
+                  data={financeChartData}
+                  options={{
+                    plugins: {
+                      legend: { display: true, position: 'bottom' },
+                    },
+                    maintainAspectRatio: false
+                  }}
+                />
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400 text-center">
+                  No transactions yet.<br />Start tracking finances!
+                </p>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Study Time Chart */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.7 }}
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-purple-600" />
+              Weekly Focus Time
+            </h3>
+            <div className="h-64">
+              <Line
+                data={studyTimeData}
+                options={{
+                  plugins: {
+                    legend: { display: false },
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      ticks: { callback: (value) => `${value}h` }
+                    }
+                  },
+                  maintainAspectRatio: false
+                }}
+              />
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Recent Activity & Quick Actions */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Upcoming Deadlines */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-orange-600" />
+              Upcoming Deadlines
+            </h3>
+            <div className="space-y-3">
+              {stats.goals > 0 ? (
+                <p className="text-gray-600 dark:text-gray-300">You have {stats.goals} active goals!</p>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">No upcoming deadlines. Set your first goal!</p>
+              )}
+              <button
+                onClick={() => navigate('/app/goals')}
+                className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all"
+              >
+                View All Goals
+              </button>
             </div>
           </motion.div>
 
           {/* Quick Actions */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Quick Actions</h3>
-              <Zap className="w-6 h-6 text-yellow-500" />
-            </div>
-            <div className="space-y-3">
-              {quickActions.map((action, index) => (
-                <motion.button
-                  key={action.name}
-                  onClick={action.action}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, delay: 0.8 + index * 0.1 }}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`w-full flex items-center space-x-4 p-4 rounded-xl ${action.color} ${action.hover} shadow-lg hover:shadow-xl transition-all duration-300 group`}
-                >
-                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                    <action.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="font-semibold text-white">{action.name}</span>
-                  <div className="ml-auto">
-                    <ChevronRight className="w-4 h-4 text-white/80 group-hover:text-white transition-colors" />
-                  </div>
-                </motion.button>
-              ))}
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => navigate('/app/habits')}
+                className="bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
+              >
+                <Target className="w-4 h-4" />
+                Habits
+              </button>
+              <button
+                onClick={() => navigate('/app/pomodoro')}
+                className="bg-gradient-to-r from-red-500 to-rose-500 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
+              >
+                <Timer className="w-4 h-4" />
+                Focus
+              </button>
+              <button
+                onClick={() => navigate('/app/desk')}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
+              >
+                <BookOpen className="w-4 h-4" />
+                Study
+              </button>
+              <button
+                onClick={() => navigate('/app/notes')}
+                className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
+              >
+                <StickyNote className="w-4 h-4" />
+                Notes
+              </button>
             </div>
           </motion.div>
         </div>
-
-        {/* Motivational Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-2xl p-4 sm:p-6 text-center"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
-            className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl"
-          >
-            <Award className="w-8 h-8 text-white" />
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.4 }}
-            className="text-2xl font-bold text-gray-900 dark:text-white mb-4"
-          >
-            "Success is the sum of small efforts repeated day in and day out."
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.6 }}
-            className="text-gray-600 dark:text-gray-300 mb-6"
-          >
-            Keep up the amazing work! You're building something incredible. 🚀
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.8 }}
-            className="flex flex-wrap justify-center gap-4 text-sm text-gray-500 dark:text-gray-400"
-          >
-            <div className="flex items-center space-x-2">
-              <Users className="w-4 h-4" />
-              <span>Join 10,000+ students</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Globe className="w-4 h-4" />
-              <span>Available worldwide</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <BarChart3 className="w-4 h-4" />
-              <span>Track your progress</span>
-            </div>
-          </motion.div>
-        </motion.div>
       </div>
     </div>
   );
