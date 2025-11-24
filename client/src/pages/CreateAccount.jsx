@@ -265,6 +265,17 @@ const CreateAccount = () => {
                 </div>
               )}
             </motion.button>
+
+            {/* Sign In Link */}
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+              Already have an account?{' '}
+              <button
+                onClick={() => navigate('/login')}
+                className="text-green-600 hover:text-green-700 font-medium"
+              >
+                Sign In
+              </button>
+            </p>
           </form>
 
           {/* Benefits */}

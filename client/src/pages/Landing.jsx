@@ -161,16 +161,26 @@ const Landing = () => {
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </motion.button>
               ) : (
-                <motion.a
-                  href="/create-account"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="btn btn-primary px-3 sm:px-6 py-2 text-sm sm:text-base"
-                >
-                  <span className="hidden sm:inline">Get Started</span>
-                  <span className="sm:hidden">Start</span>
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </motion.a>
+                <>
+                  <motion.button
+                    onClick={() => navigate('/login')}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="btn btn-secondary px-3 sm:px-6 py-2 text-sm sm:text-base"
+                  >
+                    Login
+                  </motion.button>
+                  <motion.a
+                    href="/create-account"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="btn btn-primary px-3 sm:px-6 py-2 text-sm sm:text-base"
+                  >
+                    <span className="hidden sm:inline">Get Started</span>
+                    <span className="sm:hidden">Start</span>
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </motion.a>
+                </>
               )}
 
               {/* Mobile menu button */}
@@ -374,10 +384,18 @@ const Landing = () => {
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </button>
                 ) : (
-                  <a href="/create-account" className="btn btn-primary px-8 py-4 text-lg group">
-                    Start Your Journey
-                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </a>
+                  <>
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="btn btn-secondary px-8 py-4 text-lg"
+                    >
+                      Login
+                    </button>
+                    <a href="/create-account" className="btn btn-primary px-8 py-4 text-lg group">
+                      Start Your Journey
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  </>
                 )}
                 <button className="btn btn-secondary px-8 py-4 text-lg">
                   Watch Demo
@@ -653,10 +671,18 @@ const Landing = () => {
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </button>
               ) : (
-                <a href="/create-account" className="btn btn-primary px-8 py-4 text-lg">
-                  Get Started Free
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </a>
+                <>
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="btn btn-secondary px-8 py-4 text-lg"
+                  >
+                    Login
+                  </button>
+                  <a href="/create-account" className="btn btn-primary px-8 py-4 text-lg">
+                    Get Started Free
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </a>
+                </>
               )}
               <button className="btn btn-secondary px-8 py-4 text-lg">
                 Learn More
