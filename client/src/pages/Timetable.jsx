@@ -7,15 +7,12 @@ import {
   Plus,
   Clock,
   MapPin,
-  User,
   Trash2,
-  CheckCircle,
-  AlertCircle,
-  BookOpen
+  AlertCircle
 } from 'lucide-react';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4'];
+const COLORS = ['#000000', '#333333', '#666666', '#999999', '#CCCCCC', '#E5E5E5'];
 
 const Timetable = () => {
   const [classes, setClasses] = useState([]);
@@ -86,11 +83,11 @@ const Timetable = () => {
 
   const renderWeeklyGrid = () => {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-7 gap-2 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mt-6">
         {DAYS.map((day, dayIndex) => (
-          <div key={day} className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-            <h3 className="font-semibold text-sm text-gray-900 dark:text-white mb-2">{day}</h3>
-            <div className="space-y-2">
+          <div key={day} className="glass-card rounded-xl p-4 min-h-[200px]">
+            <h3 className="font-bold text-sm mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">{day}</h3>
+            <div className="space-y-3">
               {classes
                 .filter(c => c.dayOfWeek === dayIndex)
                 .sort((a, b) => a.startTime.localeCompare(b.startTime))
@@ -98,25 +95,24 @@ const Timetable = () => {
                   <motion.div
                     key={classItem.id}
                     whileHover={{ scale: 1.02 }}
-                    className="p-2 rounded-lg text-xs"
-                    style={{ backgroundColor: classItem.color + '20', borderLeft: `3px solid ${classItem.color}` }}
+                    className="p-3 rounded-lg text-xs bg-gray-50 dark:bg-gray-800 border-l-4 border-black dark:border-white shadow-sm"
                   >
-                    <div className="font-semibold text-gray-900 dark:text-white">{classItem.name}</div>
-                    <div className="text-gray-600 dark:text-gray-300 flex items-center gap-1 mt-1">
+                    <div className="font-bold text-base mb-1">{classItem.name}</div>
+                    <div className="text-gray-500 flex items-center gap-1 mb-1">
                       <Clock className="w-3 h-3" />
                       {classItem.startTime} - {classItem.endTime}
                     </div>
                     {classItem.location && (
-                      <div className="text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                      <div className="text-gray-500 flex items-center gap-1">
                         <MapPin className="w-3 h-3" />
                         {classItem.location}
                       </div>
                     )}
                     <button
                       onClick={() => deleteClass(classItem.id)}
-                      className="mt-1 text-red-500 hover:text-red-700"
+                      className="mt-2 text-gray-400 hover:text-red-500 transition-colors w-full text-right"
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-3 h-3 inline-block" />
                     </button>
                   </motion.div>
                 ))}
@@ -128,20 +124,31 @@ const Timetable = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
       <Navbar />
-      <div className="p-6">
-        <div className="mb-8">
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold text-gray-900 dark:text-white mb-2"
+      <div className="p-6 max-w-[1600px] mx-auto">
+        <div className="mb-8 flex justify-between items-end">
+          <div>
+            <motion.h1
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-3xl font-bold mb-2 tracking-tight"
+            >
+              Class Timetable
+            </motion.h1>
+            <p className="text-gray-500">
+              Manage your weekly class schedule
+            </p>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="btn btn-primary px-6 py-3 rounded-xl flex items-center gap-2"
           >
-            Class Timetable
-          </motion.h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Manage your weekly class schedule
-          </p>
+            <Plus className="w-5 h-5" />
+            <span>Add Class</span>
+          </motion.button>
         </div>
 
         {error && (
@@ -151,23 +158,13 @@ const Timetable = () => {
           </div>
         )}
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="mb-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg flex items-center space-x-2"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Add Class</span>
-        </motion.button>
-
         {showAddForm && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+            className="mb-8 glass-card rounded-2xl p-6"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add New Class</h3>
+            <h3 className="text-lg font-bold mb-4">Add New Class</h3>
             <form onSubmit={addClass} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 type="text"
@@ -207,17 +204,6 @@ const Timetable = () => {
                   <option key={day} value={index}>{day}</option>
                 ))}
               </select>
-              <select
-                value={newClass.color}
-                onChange={(e) => setNewClass({ ...newClass, color: e.target.value })}
-                className="input"
-              >
-                {COLORS.map(color => (
-                  <option key={color} value={color} style={{ backgroundColor: color }}>
-                    {color}
-                  </option>
-                ))}
-              </select>
               <input
                 type="time"
                 value={newClass.startTime}
@@ -234,14 +220,14 @@ const Timetable = () => {
                 className="input"
                 placeholder="End Time *"
               />
-              <div className="md:col-span-2 flex gap-2">
-                <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors">
+              <div className="md:col-span-2 flex gap-3 pt-2">
+                <button type="submit" className="btn btn-primary px-6 py-2 rounded-lg">
                   Add Class
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAddForm(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors"
+                  className="btn btn-secondary px-6 py-2 rounded-lg"
                 >
                   Cancel
                 </button>
@@ -252,13 +238,19 @@ const Timetable = () => {
 
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="inline-block w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="inline-block w-8 h-8 border-4 border-black dark:border-white border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : classes.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 glass-card rounded-3xl">
             <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No classes yet</h3>
-            <p className="text-gray-600 dark:text-gray-300">Add your first class to get started!</p>
+            <h3 className="text-xl font-bold mb-2">No classes yet</h3>
+            <p className="text-gray-500 mb-6">Add your first class to get started!</p>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="btn btn-primary px-6 py-2 rounded-lg"
+            >
+              Add Class
+            </button>
           </div>
         ) : (
           renderWeeklyGrid()
