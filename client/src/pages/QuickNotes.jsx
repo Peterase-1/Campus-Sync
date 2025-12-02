@@ -7,8 +7,6 @@ import {
   Search,
   Pin,
   Trash2,
-  Archive,
-  Tag
 } from 'lucide-react';
 
 const QuickNotes = () => {
@@ -19,7 +17,7 @@ const QuickNotes = () => {
     title: '',
     content: '',
     tags: [],
-    color: '#10b981',
+    color: '#ffffff',
   });
 
   useEffect(() => {
@@ -40,7 +38,7 @@ const QuickNotes = () => {
     try {
       const created = await notesAPI.create(newNote);
       setNotes([created, ...notes]);
-      setNewNote({ title: '', content: '', tags: [], color: '#10b981' });
+      setNewNote({ title: '', content: '', tags: [], color: '#ffffff' });
       setShowAddForm(false);
     } catch (err) {
       console.error('Failed to create note');
@@ -71,26 +69,26 @@ const QuickNotes = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
       <Navbar />
-      <div className="p-6">
+      <div className="p-6 max-w-7xl mx-auto">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-bold text-gray-900 dark:text-white mb-8"
+          className="text-3xl font-bold mb-8 tracking-tight"
         >
           Quick Notes
         </motion.h1>
 
         {/* Search & Add */}
-        <div className="max-w-4xl mx-auto mb-6 flex gap-4">
+        <div className="mb-8 flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="input pl-10"
               placeholder="Search notes..."
             />
           </div>
@@ -98,7 +96,7 @@ const QuickNotes = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-2 rounded-lg font-semibold shadow-lg flex items-center gap-2"
+            className="btn btn-primary px-6 py-2 rounded-xl flex items-center gap-2 justify-center"
           >
             <Plus className="w-5 h-5" />
             New Note
@@ -110,7 +108,7 @@ const QuickNotes = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-4xl mx-auto mb-6 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+            className="mb-8 glass-card rounded-2xl p-6"
           >
             <form onSubmit={addNote} className="space-y-4">
               <input
@@ -118,25 +116,25 @@ const QuickNotes = () => {
                 value={newNote.title}
                 onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="input font-bold text-lg"
                 placeholder="Note Title"
               />
               <textarea
                 value={newNote.content}
                 onChange={(e) => setNewNote({ ...newNote, content: e.target.value })}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                className="input resize-none"
                 rows="6"
                 placeholder="Write your note here..."
               />
-              <div className="flex gap-2">
-                <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors">
+              <div className="flex gap-3 pt-2">
+                <button type="submit" className="btn btn-primary px-6 py-2 rounded-lg">
                   Save Note
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAddForm(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors"
+                  className="btn btn-secondary px-6 py-2 rounded-lg"
                 >
                   Cancel
                 </button>
@@ -146,32 +144,34 @@ const QuickNotes = () => {
         )}
 
         {/* Notes Grid */}
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredNotes.map((note, index) => (
             <motion.div
               key={note.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-200 dark:border-gray-700 relative"
+              className="glass-card rounded-2xl p-6 relative group hover:border-black/20 dark:hover:border-white/20 transition-all"
             >
               {note.pinned && (
-                <Pin className="absolute top-2 right-2 w-4 h-4 text-yellow-500 fill-current" />
+                <Pin className="absolute top-4 right-4 w-4 h-4 text-black dark:text-white fill-current" />
               )}
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{note.title}</h3>
-              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">{note.content}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">{new Date(note.createdAt).toLocaleDateString()}</span>
-                <div className="flex gap-1">
+              <h3 className="text-lg font-bold mb-2 pr-8">{note.title}</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-4 whitespace-pre-wrap">{note.content}</p>
+              <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-800">
+                <span className="text-xs text-gray-400">{new Date(note.createdAt).toLocaleDateString()}</span>
+                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => togglePin(note)}
-                    className={`p-1 rounded ${note.pinned ? 'text-yellow-500' : 'text-gray-400'} hover:text-yellow-600`}
+                    className={`p-2 rounded-lg transition-colors ${note.pinned ? 'text-black dark:text-white bg-gray-100 dark:bg-gray-800' : 'text-gray-400 hover:text-black dark:hover:text-white'}`}
+                    title={note.pinned ? "Unpin" : "Pin"}
                   >
                     <Pin className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => deleteNote(note.id)}
-                    className="p-1 rounded text-gray-400 hover:text-red-600"
+                    className="p-2 rounded-lg text-gray-400 hover:text-red-500 transition-colors"
+                    title="Delete"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -182,9 +182,9 @@ const QuickNotes = () => {
         </div>
 
         {filteredNotes.length === 0 && (
-          <div className="text-center py-12">
-            <h3 className="text-xl font-semibold mb-2">No notes found</h3>
-            <p className="text-gray-600 dark:text-gray-300">Create your first note to get started!</p>
+          <div className="text-center py-12 glass-card rounded-3xl">
+            <h3 className="text-xl font-bold mb-2">No notes found</h3>
+            <p className="text-gray-500">Create your first note to get started!</p>
           </div>
         )}
       </div>
