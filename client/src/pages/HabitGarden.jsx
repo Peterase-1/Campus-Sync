@@ -99,37 +99,39 @@ const HabitGarden = () => {
   }, [habits]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
       <Navbar />
-      <div className="p-6">
+      <div className="p-6 max-w-[1600px] mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-12">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold text-gray-900 dark:text-white mb-2"
+            className="text-4xl font-bold mb-2 tracking-tight"
           >
-            Habit Garden 🌱
+            Habit Garden
           </motion.h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-500 text-lg">
             Cultivate positive habits and watch your garden grow!
           </p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6"
+            className="glass-card p-6 rounded-2xl"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Habits</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{habits.length}</p>
+                <p className="text-sm text-gray-500 font-medium">Total Habits</p>
+                <p className="text-3xl font-bold mt-1">{habits.length}</p>
               </div>
-              <Target className="w-8 h-8 text-green-600" />
+              <div className="w-12 h-12 bg-black dark:bg-white rounded-xl flex items-center justify-center">
+                <Target className="w-6 h-6 text-white dark:text-black" />
+              </div>
             </div>
           </motion.div>
 
@@ -137,16 +139,18 @@ const HabitGarden = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-6"
+            className="glass-card p-6 rounded-2xl"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Completed Today</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-sm text-gray-500 font-medium">Completed Today</p>
+                <p className="text-3xl font-bold mt-1">
                   {habits.filter(h => h.completed).length}
                 </p>
               </div>
-              <CheckCircle className="w-8 h-8 text-blue-600" />
+              <div className="w-12 h-12 bg-black dark:bg-white rounded-xl flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-white dark:text-black" />
+              </div>
             </div>
           </motion.div>
 
@@ -154,16 +158,18 @@ const HabitGarden = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-2xl p-6"
+            className="glass-card p-6 rounded-2xl"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Best Streak</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-sm text-gray-500 font-medium">Best Streak</p>
+                <p className="text-3xl font-bold mt-1">
                   {Math.max(...habits.map(h => h.streak || 0), 0)}
                 </p>
               </div>
-              <Flame className="w-8 h-8 text-orange-600" />
+              <div className="w-12 h-12 bg-black dark:bg-white rounded-xl flex items-center justify-center">
+                <Flame className="w-6 h-6 text-white dark:text-black" />
+              </div>
             </div>
           </motion.div>
         </div>
@@ -175,7 +181,7 @@ const HabitGarden = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowAddForm(true)}
-          className="mb-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2"
+          className="mb-8 btn btn-primary px-6 py-3 rounded-xl flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
           <span>Add New Habit</span>
@@ -186,50 +192,50 @@ const HabitGarden = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+            className="mb-8 glass-card rounded-2xl p-6"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add New Habit</h3>
+            <h3 className="text-lg font-bold mb-6">Add New Habit</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Habit Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Habit Name</label>
                 <input
                   type="text"
                   value={newHabit.name}
                   onChange={e => setNewHabit({ ...newHabit, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="input w-full"
                   placeholder="e.g., Drink 8 glasses of water"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description (Optional)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description (Optional)</label>
                 <input
                   type="text"
                   value={newHabit.description}
                   onChange={e => setNewHabit({ ...newHabit, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="input w-full"
                   placeholder="Why is this habit important?"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Frequency</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Frequency</label>
                 <select
                   value={newHabit.frequency}
                   onChange={e => setNewHabit({ ...newHabit, frequency: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="input w-full"
                 >
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
                 </select>
               </div>
-              <div className="flex space-x-3">
+              <div className="flex gap-3 pt-2">
                 <button
                   onClick={addHabit}
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors"
+                  className="btn btn-primary px-6 py-2 rounded-lg"
                 >Add Habit</button>
                 <button
                   onClick={() => setShowAddForm(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors"
+                  className="btn btn-secondary px-6 py-2 rounded-lg"
                 >Cancel</button>
               </div>
             </div>
@@ -239,15 +245,15 @@ const HabitGarden = () => {
         {/* Habits List */}
         <div className="space-y-4">
           {habits.length === 0 ? (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
-              <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12 glass-card rounded-3xl">
+              <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Target className="w-12 h-12 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No habits yet</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">Start building positive habits to improve your student life!</p>
+              <h3 className="text-xl font-bold mb-2">No habits yet</h3>
+              <p className="text-gray-500 mb-6">Start building positive habits to improve your student life!</p>
               <button
                 onClick={() => setShowAddForm(true)}
-                className="bg-green-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-600 transition-colors"
+                className="btn btn-primary px-6 py-2 rounded-lg"
               >Add Your First Habit</button>
             </motion.div>
           ) : (
@@ -256,25 +262,25 @@ const HabitGarden = () => {
                 key={habit.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className={`bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 ${habit.completed ? 'ring-2 ring-green-500' : ''}`}
+                transition={{ delay: index * 0.05 }}
+                className={`glass-card rounded-2xl p-6 hover:border-black/20 dark:hover:border-white/20 transition-all ${habit.completed ? 'opacity-75' : ''}`}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-6">
                     <button
                       onClick={() => toggleHabit(habit)}
-                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${habit.completed ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 dark:border-gray-600 hover:border-green-500'}`}
+                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${habit.completed ? 'bg-black border-black text-white dark:bg-white dark:border-white dark:text-black' : 'border-gray-300 hover:border-black dark:hover:border-white'}`}
                     >
                       {habit.completed && <CheckCircle className="w-5 h-5" />}
                     </button>
                     <div>
-                      <h3 className={`text-lg font-semibold ${habit.completed ? 'line-through text-gray-500' : 'text-gray-900 dark:text-white'}`}>{habit.name}</h3>
-                      {habit.description && (<p className="text-gray-600 dark:text-gray-400 text-sm">{habit.description}</p>)}
+                      <h3 className={`text-lg font-bold ${habit.completed ? 'line-through text-gray-400' : ''}`}>{habit.name}</h3>
+                      {habit.description && (<p className="text-gray-500 text-sm">{habit.description}</p>)}
                       <div className="flex items-center space-x-4 mt-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">{habit.frequency}</span>
-                        <div className="flex items-center space-x-1">
-                          <Flame className="w-4 h-4 text-orange-500" />
-                          <span className="text-xs text-gray-600 dark:text-gray-400">{habit.streak || 0} day streak</span>
+                        <span className="text-xs font-medium uppercase tracking-wider text-gray-400">{habit.frequency}</span>
+                        <div className="flex items-center space-x-1 text-gray-500">
+                          <Flame className="w-4 h-4" />
+                          <span className="text-xs font-medium">{habit.streak || 0} day streak</span>
                         </div>
                       </div>
                     </div>
@@ -283,7 +289,7 @@ const HabitGarden = () => {
                     {habit.streak > 0 && (
                       <button
                         onClick={() => resetStreak(habit)}
-                        className="p-2 text-gray-400 hover:text-yellow-500 transition-colors"
+                        className="p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors"
                         title="Reset Streak"
                       >
                         <Target className="w-4 h-4" />
@@ -291,7 +297,7 @@ const HabitGarden = () => {
                     )}
                     <button
                       onClick={() => deleteHabit(habit.id)}
-                      className="p-2 text-gray-400 hover:text-red-5 transition-colors"
+                      className="p-2 text-gray-400 hover:text-red-500 transition-colors"
                       title="Delete Habit"
                     >
                       <Trash2 className="w-4 h-4" />
