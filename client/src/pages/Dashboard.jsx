@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import Navbar from '../components/Navbar';
-import { Line, Doughnut, Bar } from 'react-chartjs-2';
+import { Line, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -23,11 +23,10 @@ import {
   BookOpen,
   Star,
   Clock,
-  TrendingUp,
   Calendar,
-  CheckCircle,
   Timer,
-  StickyNote
+  StickyNote,
+  ArrowRight
 } from 'lucide-react';
 import { habitsAPI, financeAPI, studyAPI, goalsAPI, pomodoroAPI } from '../utils/api';
 
@@ -126,7 +125,7 @@ const Dashboard = () => {
     labels: ['Completed', 'Pending'],
     datasets: [{
       data: [stats.completedHabits, stats.habits - stats.completedHabits],
-      backgroundColor: ['#10b981', '#e5e7eb'],
+      backgroundColor: ['#000000', '#e5e5e5'],
       borderWidth: 0,
     }]
   };
@@ -136,7 +135,7 @@ const Dashboard = () => {
     labels: ['Income', 'Expenses', 'Savings'],
     datasets: [{
       data: [stats.totalIncome, stats.totalExpenses, stats.totalIncome - stats.totalExpenses],
-      backgroundColor: ['#10b981', '#ef4444', '#3b82f6'],
+      backgroundColor: ['#000000', '#666666', '#cccccc'],
       borderWidth: 0,
     }]
   };
@@ -147,8 +146,8 @@ const Dashboard = () => {
     datasets: [{
       label: 'Focus Hours',
       data: [2.5, 3, 1.5, 4, 2, 3.5, 1],
-      backgroundColor: 'rgba(16, 185, 129, 0.2)',
-      borderColor: '#10b981',
+      backgroundColor: 'rgba(0, 0, 0, 0.1)',
+      borderColor: '#000000',
       borderWidth: 2,
       fill: true,
       tension: 0.4,
@@ -161,7 +160,6 @@ const Dashboard = () => {
       value: stats.habits,
       subtitle: `${stats.completedHabits} completed`,
       icon: Target,
-      color: 'from-green-500 to-emerald-500',
       onClick: () => navigate('/app/habits')
     },
     {
@@ -169,7 +167,6 @@ const Dashboard = () => {
       value: `$${stats.totalIncome - stats.totalExpenses}`,
       subtitle: `$${stats.totalIncome} income`,
       icon: DollarSign,
-      color: 'from-blue-500 to-cyan-500',
       onClick: () => navigate('/app/finance')
     },
     {
@@ -177,7 +174,6 @@ const Dashboard = () => {
       value: stats.studyNotes,
       subtitle: 'Keep learning',
       icon: BookOpen,
-      color: 'from-purple-500 to-pink-500',
       onClick: () => navigate('/app/desk')
     },
     {
@@ -185,7 +181,6 @@ const Dashboard = () => {
       value: `${stats.completedGoals}/${stats.goals}`,
       subtitle: 'Completed',
       icon: Star,
-      color: 'from-orange-500 to-amber-500',
       onClick: () => navigate('/app/goals')
     },
     {
@@ -193,7 +188,6 @@ const Dashboard = () => {
       value: `${stats.focusHours}h`,
       subtitle: `${stats.pomodoroSessions} sessions`,
       icon: Timer,
-      color: 'from-red-500 to-rose-500',
       onClick: () => navigate('/app/pomodoro')
     }
   ];
@@ -201,31 +195,31 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
-        <div className="inline-block w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+        <div className="inline-block w-8 h-8 border-4 border-black dark:border-white border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
       <Navbar />
-      <div className="p-6">
+      <div className="p-6 max-w-[1600px] mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-12"
         >
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-4xl font-bold mb-2 tracking-tight">
             Welcome back, {user?.name || 'Student'}! 👋
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-500 text-lg">
             Here's your productivity overview for today
           </p>
         </motion.div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
           {quickStats.map((stat, index) => (
             <motion.div
               key={stat.title}
@@ -234,29 +228,29 @@ const Dashboard = () => {
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -5 }}
               onClick={stat.onClick}
-              className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-lg border border-gray-200 dark:border-gray-700 cursor-pointer"
+              className="glass-card p-6 rounded-2xl cursor-pointer hover:border-black/20 dark:hover:border-white/20 transition-all group"
             >
-              <div className={`w-12 h-12 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mb-3`}>
-                <stat.icon className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center mb-4 group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-colors">
+                <stat.icon className="w-6 h-6" />
               </div>
-              <h3 className="text-sm text-gray-600 dark:text-gray-400 mb-1">{stat.title}</h3>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{stat.value}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{stat.subtitle}</p>
+              <h3 className="text-sm text-gray-500 mb-1 font-medium">{stat.title}</h3>
+              <p className="text-2xl font-bold mb-1">{stat.value}</p>
+              <p className="text-xs text-gray-400">{stat.subtitle}</p>
             </motion.div>
           ))}
         </div>
 
         {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
           {/* Habit Completion Chart */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+            className="glass-card p-8 rounded-3xl"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <Target className="w-5 h-5 text-green-600" />
+            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+              <Target className="w-5 h-5" />
               Habit Completion
             </h3>
             <div className="h-64 flex items-center justify-center">
@@ -265,15 +259,17 @@ const Dashboard = () => {
                   data={habitChartData}
                   options={{
                     plugins: {
-                      legend: { display: true, position: 'bottom' },
+                      legend: { display: true, position: 'bottom', labels: { usePointStyle: true } },
                     },
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    cutout: '70%'
                   }}
                 />
               ) : (
-                <p className="text-gray-500 dark:text-gray-400 text-center">
-                  No habits yet.<br />Start building habits!
-                </p>
+                <div className="text-center text-gray-400">
+                  <p>No habits yet.</p>
+                  <p className="text-sm">Start building habits!</p>
+                </div>
               )}
             </div>
           </motion.div>
@@ -283,10 +279,10 @@ const Dashboard = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+            className="glass-card p-8 rounded-3xl"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+              <DollarSign className="w-5 h-5" />
               Finance Overview
             </h3>
             <div className="h-64 flex items-center justify-center">
@@ -295,15 +291,17 @@ const Dashboard = () => {
                   data={financeChartData}
                   options={{
                     plugins: {
-                      legend: { display: true, position: 'bottom' },
+                      legend: { display: true, position: 'bottom', labels: { usePointStyle: true } },
                     },
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    cutout: '70%'
                   }}
                 />
               ) : (
-                <p className="text-gray-500 dark:text-gray-400 text-center">
-                  No transactions yet.<br />Start tracking finances!
-                </p>
+                <div className="text-center text-gray-400">
+                  <p>No transactions yet.</p>
+                  <p className="text-sm">Start tracking finances!</p>
+                </div>
               )}
             </div>
           </motion.div>
@@ -313,10 +311,10 @@ const Dashboard = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.7 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+            className="glass-card p-8 rounded-3xl"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-purple-600" />
+            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+              <Clock className="w-5 h-5" />
               Weekly Focus Time
             </h3>
             <div className="h-64">
@@ -329,7 +327,11 @@ const Dashboard = () => {
                   scales: {
                     y: {
                       beginAtZero: true,
-                      ticks: { callback: (value) => `${value}h` }
+                      ticks: { callback: (value) => `${value}h` },
+                      grid: { color: 'rgba(0,0,0,0.05)' }
+                    },
+                    x: {
+                      grid: { display: false }
                     }
                   },
                   maintainAspectRatio: false
@@ -340,29 +342,36 @@ const Dashboard = () => {
         </div>
 
         {/* Recent Activity & Quick Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Upcoming Deadlines */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+            className="glass-card p-8 rounded-3xl"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-orange-600" />
+            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+              <Calendar className="w-5 h-5" />
               Upcoming Deadlines
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-6">
               {stats.goals > 0 ? (
-                <p className="text-gray-600 dark:text-gray-300">You have {stats.goals} active goals!</p>
+                <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border-l-4 border-black dark:border-white">
+                  <p className="font-medium">You have {stats.goals} active goals!</p>
+                  <p className="text-sm text-gray-500 mt-1">Keep pushing forward.</p>
+                </div>
               ) : (
-                <p className="text-gray-500 dark:text-gray-400">No upcoming deadlines. Set your first goal!</p>
+                <div className="text-center py-8 text-gray-400">
+                  <p>No upcoming deadlines.</p>
+                  <p className="text-sm">Set your first goal!</p>
+                </div>
               )}
               <button
                 onClick={() => navigate('/app/goals')}
-                className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all"
+                className="w-full btn btn-primary py-4 rounded-xl flex items-center justify-center gap-2 group"
               >
                 View All Goals
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </motion.div>
@@ -372,37 +381,37 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+            className="glass-card p-8 rounded-3xl"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-2 gap-3">
+            <h3 className="text-lg font-bold mb-6">Quick Actions</h3>
+            <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={() => navigate('/app/habits')}
-                className="bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all flex flex-col items-center justify-center gap-2 group"
               >
-                <Target className="w-4 h-4" />
-                Habits
+                <Target className="w-6 h-6" />
+                <span className="font-medium">Habits</span>
               </button>
               <button
                 onClick={() => navigate('/app/pomodoro')}
-                className="bg-gradient-to-r from-red-500 to-rose-500 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all flex flex-col items-center justify-center gap-2 group"
               >
-                <Timer className="w-4 h-4" />
-                Focus
+                <Timer className="w-6 h-6" />
+                <span className="font-medium">Focus</span>
               </button>
               <button
                 onClick={() => navigate('/app/desk')}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all flex flex-col items-center justify-center gap-2 group"
               >
-                <BookOpen className="w-4 h-4" />
-                Study
+                <BookOpen className="w-6 h-6" />
+                <span className="font-medium">Study</span>
               </button>
               <button
                 onClick={() => navigate('/app/notes')}
-                className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all flex flex-col items-center justify-center gap-2 group"
               >
-                <StickyNote className="w-4 h-4" />
-                Notes
+                <StickyNote className="w-6 h-6" />
+                <span className="font-medium">Notes</span>
               </button>
             </div>
           </motion.div>
