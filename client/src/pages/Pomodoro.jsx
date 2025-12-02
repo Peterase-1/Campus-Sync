@@ -15,7 +15,6 @@ const Pomodoro = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes in seconds
   const [sessionType, setSessionType] = useState('work'); // 'work' or 'break'
-  const [sessions, setSessions] = useState([]);
   const [stats, setStats] = useState(null);
   const [taskName, setTaskName] = useState('');
   const [currentSessionId, setCurrentSessionId] = useState(null);
@@ -94,13 +93,13 @@ const Pomodoro = () => {
     : ((5 * 60 - timeLeft) / (5 * 60)) * 100;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
       <Navbar />
-      <div className="p-6">
+      <div className="p-6 max-w-7xl mx-auto">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-bold text-gray-900 dark:text-white mb-8"
+          className="text-3xl font-bold mb-8 tracking-tight text-center"
         >
           Pomodoro Timer
         </motion.h1>
@@ -110,52 +109,26 @@ const Pomodoro = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-3xl p-8 mb-6"
+            className="glass-card rounded-3xl p-8 mb-8 text-center relative overflow-hidden"
           >
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-gray-800 shadow-sm mb-4">
-                {sessionType === 'work' ? <Clock className="w-5 h-5 text-green-600" /> : <Coffee className="w-5 h-5 text-blue-600" />}
-                <span className="font-semibold text-gray-900 dark:text-white">
-                  {sessionType === 'work' ? 'Focus Session' : 'Break Time'}
-                </span>
-              </div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gray-100 dark:bg-gray-800">
+              <motion.div
+                className="h-full bg-black dark:bg-white"
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 1, ease: "linear" }}
+              />
             </div>
 
-            {/* Circular Progress & Time */}
-            <div className="relative w-72 h-72 mx-auto mb-6">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle
-                  cx="144"
-                  cy="144"
-                  r="128"
-                  stroke="currentColor"
-                  strokeWidth="12"
-                  fill="none"
-                  className="text-gray-200 dark:text-gray-700"
-                />
-                <circle
-                  cx="144"
-                  cy="144"
-                  r="128"
-                  stroke="currentColor"
-                  strokeWidth="12"
-                  fill="none"
-                  strokeDasharray={`${2 * Math.PI * 128}`}
-                  strokeDashoffset={`${2 * Math.PI * 128 * (1 - progress / 100)}`}
-                  className={sessionType === 'work' ? 'text-green-600' : 'text-blue-600'}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-6xl font-bold text-gray-900 dark:text-white mb-2">
-                    {formatTime(timeLeft)}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    {Math.round(progress)}% Complete
-                  </div>
-                </div>
-              </div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 mb-8">
+              {sessionType === 'work' ? <Clock className="w-5 h-5" /> : <Coffee className="w-5 h-5" />}
+              <span className="font-semibold">
+                {sessionType === 'work' ? 'Focus Session' : 'Break Time'}
+              </span>
+            </div>
+
+            <div className="text-8xl font-bold mb-8 tabular-nums tracking-tighter">
+              {formatTime(timeLeft)}
             </div>
 
             {/* Task Input */}
@@ -164,7 +137,7 @@ const Pomodoro = () => {
                 type="text"
                 value={taskName}
                 onChange={(e) => setTaskName(e.target.value)}
-                className="w-full mb-4 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full max-w-md mb-8 input text-center text-lg"
                 placeholder="What are you working on?"
               />
             )}
@@ -176,7 +149,7 @@ const Pomodoro = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={startSession}
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-8 py-3 rounded-xl font-semibold shadow-lg flex items-center gap-2"
+                  className="btn btn-primary px-8 py-3 rounded-xl flex items-center gap-2 text-lg"
                 >
                   <Play className="w-5 h-5" />
                   Start
@@ -186,7 +159,7 @@ const Pomodoro = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setIsRunning(false)}
-                  className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-8 py-3 rounded-xl font-semibold shadow-lg flex items-center gap-2"
+                  className="btn btn-secondary px-8 py-3 rounded-xl flex items-center gap-2 text-lg"
                 >
                   <Pause className="w-5 h-5" />
                   Pause
@@ -196,7 +169,7 @@ const Pomodoro = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={resetTimer}
-                className="bg-gray-500 text-white px-8 py-3 rounded-xl font-semibold shadow-lg flex items-center gap-2"
+                className="btn btn-secondary px-8 py-3 rounded-xl flex items-center gap-2 text-lg"
               >
                 <RotateCcw className="w-5 h-5" />
                 Reset
@@ -211,25 +184,25 @@ const Pomodoro = () => {
               animate={{ opacity: 1, y: 0 }}
               className="grid grid-cols-2 md:grid-cols-4 gap-4"
             >
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                <BarChart3 className="w-6 h-6 text-green-600 mb-2" />
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalSessions}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Total Sessions</div>
+              <div className="glass-card rounded-xl p-4 text-center">
+                <BarChart3 className="w-6 h-6 mx-auto mb-2" />
+                <div className="text-2xl font-bold">{stats.totalSessions}</div>
+                <div className="text-xs text-gray-500 uppercase tracking-wider">Sessions</div>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                <Clock className="w-6 h-6 text-blue-600 mb-2" />
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalHours}h</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Total Hours</div>
+              <div className="glass-card rounded-xl p-4 text-center">
+                <Clock className="w-6 h-6 mx-auto mb-2" />
+                <div className="text-2xl font-bold">{stats.totalHours}h</div>
+                <div className="text-xs text-gray-500 uppercase tracking-wider">Hours</div>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                <Play className="w-6 h-6 text-green-600 mb-2" />
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.workSessions}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Work Sessions</div>
+              <div className="glass-card rounded-xl p-4 text-center">
+                <Play className="w-6 h-6 mx-auto mb-2" />
+                <div className="text-2xl font-bold">{stats.workSessions}</div>
+                <div className="text-xs text-gray-500 uppercase tracking-wider">Work</div>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                <Coffee className="w-6 h-6 text-orange-600 mb-2" />
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">{stats.breakSessions}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Break Sessions</div>
+              <div className="glass-card rounded-xl p-4 text-center">
+                <Coffee className="w-6 h-6 mx-auto mb-2" />
+                <div className="text-2xl font-bold">{stats.breakSessions}</div>
+                <div className="text-xs text-gray-500 uppercase tracking-wider">Breaks</div>
               </div>
             </motion.div>
           )}
