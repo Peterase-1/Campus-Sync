@@ -71,47 +71,49 @@ const FinanceCenter = () => {
   };
 
   const categories = [
-    { id: 'food', name: 'Food & Dining', color: 'bg-red-500' },
-    { id: 'transport', name: 'Transportation', color: 'bg-blue-500' },
-    { id: 'entertainment', name: 'Entertainment', color: 'bg-purple-500' },
-    { id: 'education', name: 'Education', color: 'bg-green-500' },
-    { id: 'health', name: 'Health & Fitness', color: 'bg-pink-500' },
-    { id: 'shopping', name: 'Shopping', color: 'bg-yellow-500' },
-    { id: 'other', name: 'Other', color: 'bg-gray-500' },
+    { id: 'food', name: 'Food & Dining', color: 'bg-gray-100 dark:bg-gray-800' },
+    { id: 'transport', name: 'Transportation', color: 'bg-gray-100 dark:bg-gray-800' },
+    { id: 'entertainment', name: 'Entertainment', color: 'bg-gray-100 dark:bg-gray-800' },
+    { id: 'education', name: 'Education', color: 'bg-gray-100 dark:bg-gray-800' },
+    { id: 'health', name: 'Health & Fitness', color: 'bg-gray-100 dark:bg-gray-800' },
+    { id: 'shopping', name: 'Shopping', color: 'bg-gray-100 dark:bg-gray-800' },
+    { id: 'other', name: 'Other', color: 'bg-gray-100 dark:bg-gray-800' },
   ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
       <Navbar />
-      <div className="p-6">
+      <div className="p-6 max-w-[1600px] mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-12">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold text-gray-900 dark:text-white mb-2"
+            className="text-4xl font-bold mb-2 tracking-tight"
           >
-            Finance Center 💰
+            Finance Center
           </motion.h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-500 text-lg">
             Track your income, expenses, and build healthy financial habits!
           </p>
         </div>
 
         {/* Financial Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-6"
+            className="glass-card p-6 rounded-2xl"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Income</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">${totalIncome.toFixed(2)}</p>
+                <p className="text-sm text-gray-500 font-medium">Total Income</p>
+                <p className="text-3xl font-bold mt-1">${totalIncome.toFixed(2)}</p>
               </div>
-              <TrendingUp className="w-8 h-8 text-green-600" />
+              <div className="w-12 h-12 bg-black dark:bg-white rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-white dark:text-black" />
+              </div>
             </div>
           </motion.div>
 
@@ -119,14 +121,16 @@ const FinanceCenter = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 rounded-2xl p-6"
+            className="glass-card p-6 rounded-2xl"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Expenses</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">${totalExpenses.toFixed(2)}</p>
+                <p className="text-sm text-gray-500 font-medium">Total Expenses</p>
+                <p className="text-3xl font-bold mt-1">${totalExpenses.toFixed(2)}</p>
               </div>
-              <TrendingDown className="w-8 h-8 text-red-600" />
+              <div className="w-12 h-12 bg-black dark:bg-white rounded-xl flex items-center justify-center">
+                <TrendingDown className="w-6 h-6 text-white dark:text-black" />
+              </div>
             </div>
           </motion.div>
 
@@ -134,14 +138,16 @@ const FinanceCenter = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-6"
+            className="glass-card p-6 rounded-2xl"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Savings</p>
-                <p className={`text-2xl font-bold ${totalSavings >= 0 ? 'text-green-600' : 'text-red-600'}`}>${totalSavings.toFixed(2)}</p>
+                <p className="text-sm text-gray-500 font-medium">Total Savings</p>
+                <p className={`text-3xl font-bold mt-1 ${totalSavings >= 0 ? '' : 'text-red-500'}`}>${totalSavings.toFixed(2)}</p>
               </div>
-              <Wallet className="w-8 h-8 text-blue-600" />
+              <div className="w-12 h-12 bg-black dark:bg-white rounded-xl flex items-center justify-center">
+                <Wallet className="w-6 h-6 text-white dark:text-black" />
+              </div>
             </div>
           </motion.div>
         </div>
@@ -153,7 +159,7 @@ const FinanceCenter = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowAddForm(true)}
-          className="mb-6 bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2"
+          className="mb-8 btn btn-primary px-6 py-3 rounded-xl flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
           <span>Add Transaction</span>
@@ -164,47 +170,47 @@ const FinanceCenter = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+            className="mb-8 glass-card rounded-2xl p-6"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add Transaction</h3>
+            <h3 className="text-lg font-bold mb-6">Add Transaction</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Type</label>
                 <select
                   value={newTransaction.type}
                   onChange={e => setNewTransaction({ ...newTransaction, type: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input w-full"
                 >
                   <option value="income">Income</option>
                   <option value="expense">Expense</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount</label>
                 <input
                   type="number"
                   value={newTransaction.amount}
                   onChange={e => setNewTransaction({ ...newTransaction, amount: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input w-full"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
                 <input
                   type="text"
                   value={newTransaction.description}
                   onChange={e => setNewTransaction({ ...newTransaction, description: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-5 focus:border-transparent"
+                  className="input w-full"
                   placeholder="What was this for?"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
                 <select
                   value={newTransaction.category}
                   onChange={e => setNewTransaction({ ...newTransaction, category: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input w-full"
                 >
                   {categories.map(category => (
                     <option key={category.id} value={category.id}>
@@ -213,16 +219,16 @@ const FinanceCenter = () => {
                   ))}
                 </select>
               </div>
-              <div className="flex space-x-3 mt-2">
+              <div className="flex gap-3 pt-2 md:col-span-2">
                 <button
                   onClick={addTransaction}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                  className="btn btn-primary px-6 py-2 rounded-lg"
                 >
                   Add Transaction
                 </button>
                 <button
                   onClick={() => setShowAddForm(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors"
+                  className="btn btn-secondary px-6 py-2 rounded-lg"
                 >
                   Cancel
                 </button>
@@ -233,17 +239,17 @@ const FinanceCenter = () => {
 
         {/* Transactions List */}
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Recent Transactions</h3>
+          <h3 className="text-xl font-bold mb-6">Recent Transactions</h3>
           {transactions.length === 0 ? (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
-              <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12 glass-card rounded-3xl">
+              <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
                 <DollarSign className="w-12 h-12 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No transactions yet</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">Start tracking your income and expenses to manage your finances better!</p>
+              <h3 className="text-xl font-bold mb-2">No transactions yet</h3>
+              <p className="text-gray-500 mb-6">Start tracking your income and expenses to manage your finances better!</p>
               <button
                 onClick={() => setShowAddForm(true)}
-                className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                className="btn btn-primary px-6 py-2 rounded-lg"
               >
                 Add Your First Transaction
               </button>
@@ -258,29 +264,29 @@ const FinanceCenter = () => {
                     key={transaction.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
+                    transition={{ delay: index * 0.05 }}
+                    className="glass-card rounded-2xl p-6 hover:border-black/20 dark:hover:border-white/20 transition-all"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className={`w-12 h-12 ${category?.color} rounded-xl flex items-center justify-center`}>
-                          <DollarSign className="w-6 h-6 text-white" />
+                      <div className="flex items-center space-x-6">
+                        <div className={`w-12 h-12 ${category?.color} rounded-xl flex items-center justify-center text-black dark:text-white`}>
+                          <DollarSign className="w-6 h-6" />
                         </div>
                         <div>
-                          <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          <h4 className="text-lg font-bold">
                             {transaction.description}
                           </h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-gray-500">
                             {category?.name} • {new Date(transaction.date).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-6">
                         <div className="text-right">
-                          <p className={`text-lg font-bold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                            {transaction.type === 'income' ? '+' : '-'}${(transaction.amount || 0).toFixed(2)}
+                          <p className="text-lg font-bold">
+                            {transaction.type === 'income' ? '+' : '-'}${Math.abs(transaction.amount || 0).toFixed(2)}
                           </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                          <p className="text-sm text-gray-500 uppercase tracking-wider font-medium">
                             {transaction.type === 'income' ? 'Income' : 'Expense'}
                           </p>
                         </div>
