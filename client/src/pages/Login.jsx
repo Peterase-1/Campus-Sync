@@ -44,9 +44,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex items-center justify-center p-4 selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black">
       {/* Background Elements */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 -z-10 overflow-hidden">
         <motion.div
           animate={{
             y: [0, -20, 0],
@@ -57,7 +57,7 @@ const Login = () => {
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className="absolute top-20 left-10 w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-3xl rotate-45"
+          className="absolute top-20 left-10 w-24 h-24 border border-black/5 dark:border-white/5 rounded-3xl rotate-45"
         />
         <motion.div
           animate={{
@@ -70,7 +70,7 @@ const Login = () => {
             ease: "easeInOut",
             delay: 2
           }}
-          className="absolute bottom-20 right-10 w-16 h-16 bg-green-200 dark:bg-green-800/40 rounded-full"
+          className="absolute bottom-20 right-10 w-32 h-32 border border-black/5 dark:border-white/5 rounded-full"
         />
       </div>
 
@@ -83,17 +83,12 @@ const Login = () => {
           className="text-center mb-8"
         >
           <div className="flex items-center justify-center mb-6">
-            <div className="relative">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 rounded-2xl flex items-center justify-center shadow-lg">
-                <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
-                  <span className="text-green-600 font-bold text-xl">CS</span>
-                </div>
-              </div>
-              <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-400 rounded-full animate-pulse"></div>
+            <div className="w-16 h-16 bg-black dark:bg-white rounded-full flex items-center justify-center shadow-xl">
+              <Sparkles className="w-8 h-8 text-white dark:text-black" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold gradient-text mb-2">Welcome Back</h1>
-          <p className="text-gray-600 dark:text-gray-300">Sign in to continue managing your academic life</p>
+          <h1 className="text-3xl font-bold mb-2 tracking-tight">Welcome Back</h1>
+          <p className="text-gray-500">Sign in to continue managing your academic life</p>
         </motion.div>
 
         {/* Login Form */}
@@ -101,7 +96,7 @@ const Login = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="card"
+          className="glass-card rounded-3xl p-8"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
@@ -110,14 +105,14 @@ const Login = () => {
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="input pl-10"
+                  className="input pl-12"
                   placeholder="Enter your email"
                 />
               </div>
@@ -129,14 +124,14 @@ const Login = () => {
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="input pl-10"
+                  className="input pl-12"
                   placeholder="Enter your password"
                 />
               </div>
@@ -144,8 +139,8 @@ const Login = () => {
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-red-600" />
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                 <span className="text-sm text-red-600 dark:text-red-400">{error}</span>
               </div>
             )}
@@ -156,11 +151,11 @@ const Login = () => {
               disabled={isSubmitting}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full btn btn-primary py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full btn btn-primary py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
                   Signing In...
                 </div>
               ) : (
@@ -172,9 +167,9 @@ const Login = () => {
             </motion.button>
 
             {/* Sign Up Link */}
-            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-center text-sm text-gray-500">
               Don't have an account?{' '}
-              <Link to="/create-account" className="text-green-600 hover:text-green-700 font-medium">
+              <Link to="/create-account" className="text-black dark:text-white font-semibold hover:underline">
                 Create Account
               </Link>
             </p>
@@ -188,18 +183,18 @@ const Login = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-8 text-center"
         >
-          <div className="flex items-center justify-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-center gap-6 text-sm text-gray-400">
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-green-600" />
-              <span>Secure & Private</span>
+              <Shield className="w-4 h-4" />
+              <span>Secure</span>
             </div>
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-green-600" />
-              <span>Free Forever</span>
+              <Zap className="w-4 h-4" />
+              <span>Fast</span>
             </div>
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-green-600" />
-              <span>No Ads</span>
+              <Sparkles className="w-4 h-4" />
+              <span>Free</span>
             </div>
           </div>
         </motion.div>
