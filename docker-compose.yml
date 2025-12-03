@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: campussync-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: campussync
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - campussync-network
+
+  backend:
+    build: ./server
+    image: petros1234/campussync-backend:latest
+    container_name: campussync-backend
+    environment:
+      - DATABASE_URL=postgresql://postgres:Peterase2586#@postgres:5432/campus_sync
+      - NODE_ENV=production
+      - PORT=4000
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+    networks:
+      - campussync-network
+
+  frontend:
+    build: ./client
+    image: petros1234/campussync-frontend:latest
+    container_name: campussync-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - campussync-network
+
+volumes:
+  pgdata:
+
+
+networks:
+  campussync-network:
+    driver: bridge
